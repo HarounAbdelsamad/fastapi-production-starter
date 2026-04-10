@@ -8,7 +8,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import get_settings
 from app.core.exceptions import unhandled_exception_handler
 from app.core.logging import setup_logging
-from app.db.database import init_db
+from app.db.database import init_db 
 from app.routers import health, user
 
 logger = logging.getLogger(__name__)
