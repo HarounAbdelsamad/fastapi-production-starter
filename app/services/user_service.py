@@ -1,0 +1,55 @@
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from app.core.security import hash_password
+from app.models.user import User
+from app.schemas.user import UserCreate, UserUpdate
+
+
+async def get_user(db: AsyncSession, user_id: str) -> User | None:
+    result = await db.execute(select(User).where(User.user_id == user_id.strip()))
+    return result.scalars().first()
+
+
+async def get_all_users(db: AsyncSession) -> list[User]:
+    result = await db.execute(select(User))
+    return list(result.scalars().all())
+
+
+async def create_user(db: AsyncSession, data: UserCreate) -> User | None:
+    if await get_user(db, data.user_id):
+        return None
+    user = User(
+        user_id=data.user_id,
+        username=data.username,
+        password_hash=hash_password(data.password),
+        email=data.email,
+        phone_number=data.phone_number,
+    )
+    db.add(user)
+    await db.commit()
+    await db.refresh(user)
+    return user
+
+
+async def update_user(db: AsyncSession, user_id: str, data: UserUpdate) -> User | None:
+    user = await get_user(db, user_id)
+    if not user:
+        return None
+    updates = data.model_dump(exclude_unset=True)
+    if "password" in updates:
+        updates["password_hash"] = hash_password(updates.pop("password"))
+    for field, value in updates.items():
+        setattr(user, field, value)
+    await db.commit()
+    await db.refresh(user)
+    return user
+
+
+async def delete_user(db: AsyncSession, user_id: str) -> User | None:
+    user = await get_user(db, user_id)
+    if not user:
+        return None
+    await db.delete(user)
+    await db.commit()
+    return user
