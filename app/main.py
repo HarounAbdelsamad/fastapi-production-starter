@@ -4,12 +4,15 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from starlette.middleware.trustedhost import TrustedHostMiddleware
 
+from app.core.cache import close_redis
 from app.core.config import get_settings
 from app.core.exceptions import unhandled_exception_handler
 from app.core.logging import setup_logging
-from app.db.database import init_db 
-from app.routers import health, user
+from app.db.database import init_db
+from app.internal import admin
+from app.routers import auth, health, user
 
 logger = logging.getLogger(__name__)
 
@@ -21,6 +24,7 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     logger.info("Starting %s (%s)", settings.APP_TITLE, settings.APP_ENV)
     await init_db()
     yield
+    await close_redis()
     logger.info("Shutting down")
 
 
@@ -40,14 +44,18 @@ def create_app() -> FastAPI:
         CORSMiddleware,
         allow_origins=settings.CORS_ORIGINS,
         allow_credentials=True,
-        allow_methods=["*"],
-        allow_headers=["*"],
+        allow_methods=settings.CORS_ALLOW_METHODS,
+        allow_headers=settings.CORS_ALLOW_HEADERS,
+        max_age=settings.CORS_MAX_AGE,
     )
+    app.add_middleware(TrustedHostMiddleware, allowed_hosts=settings.TRUSTED_HOSTS)
 
     app.add_exception_handler(Exception, unhandled_exception_handler)
 
     app.include_router(health.router)
+    app.include_router(auth.router, prefix="/api/auth", tags=["Auth"])
     app.include_router(user.router, prefix="/api/users", tags=["Users"])
+    app.include_router(admin.router, prefix="/api", tags=["Admin"])
 
     return app
 

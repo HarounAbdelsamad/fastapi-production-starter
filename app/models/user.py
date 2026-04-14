@@ -12,3 +12,4 @@ class User(Base):
     password_hash: Mapped[str] = mapped_column(String)
     email: Mapped[str] = mapped_column(String)
     phone_number: Mapped[str | None] = mapped_column(String, nullable=True, default="")
+    role: Mapped[str] = mapped_column(String, default="user")

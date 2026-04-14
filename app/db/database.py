@@ -15,10 +15,17 @@ connect_args: dict = {}
 if settings.is_sqlite:
     connect_args["check_same_thread"] = False
 
+engine_kwargs: dict = {
+    "echo": settings.DEBUG,
+    "connect_args": connect_args,
+}
+if not settings.is_sqlite:
+    engine_kwargs["pool_size"] = settings.DB_POOL_SIZE
+    engine_kwargs["max_overflow"] = settings.DB_MAX_OVERFLOW
+
 engine = create_async_engine(
     settings.DATABASE_URL,
-    echo=settings.DEBUG,
-    connect_args=connect_args,
+    **engine_kwargs,
 )
 
 SessionLocal = async_sessionmaker(
@@ -39,11 +46,12 @@ _tables_created = False
 async def init_db() -> None:
     """Create all ORM tables if they don't exist yet (idempotent)."""
     global _tables_created
-    if _tables_created:
+    if _tables_created or not settings.AUTO_CREATE_TABLES:
         return
     async with _tables_lock:
         if _tables_created:
             return
+        from app.models.revoked_token import RevokedToken  # noqa: F401
         from app.models.user import User  # noqa: F401 — register models
 
         async with engine.begin() as conn:

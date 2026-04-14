@@ -7,6 +7,7 @@ class UserCreate(BaseModel):
     password: str
     email: str
     phone_number: str | None = None
+    role: str = "user"
 
 
 class UserResponse(BaseModel):
@@ -16,6 +17,7 @@ class UserResponse(BaseModel):
     username: str
     email: str
     phone_number: str | None = None
+    role: str
 
 
 class UserUpdate(BaseModel):
