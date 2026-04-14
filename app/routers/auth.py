@@ -1,6 +1,6 @@
 from datetime import UTC, datetime
 
-from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, status
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Request, status
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -14,15 +14,19 @@ from app.core.auth import (
 from app.core.config import get_settings
 from app.core.deps import get_current_user, oauth2_scheme
 from app.core.email import send_email
+from app.core.rate_limit import limiter
 from app.core.security import hash_password, verify_password
+from app.core.throttle import check_login_throttle, reset_login_throttle
 from app.db.database import get_session
 from app.models.revoked_token import RevokedToken
 from app.models.user import User
 from app.schemas.auth import RefreshTokenRequest, TokenResponse
 from app.schemas.password import PasswordResetConfirm, PasswordResetRequest
+from app.services.audit_service import log_action
 from app.tasks.email_tasks import send_email_task
 
 router = APIRouter()
+settings = get_settings()
 
 
 async def _revoke_token(
@@ -45,14 +49,20 @@ async def _revoke_token(
 
 
 @router.post("/login", response_model=TokenResponse)
+@limiter.limit(settings.RATE_LIMIT_AUTH)
 async def login(
+    request: Request,
     form_data: OAuth2PasswordRequestForm = Depends(),
     db: AsyncSession = Depends(get_session),
 ) -> TokenResponse:
+    _ = request
+    await check_login_throttle(form_data.username)
     result = await db.execute(select(User).where(User.username == form_data.username))
     user = result.scalars().first()
     if not user or not verify_password(form_data.password, user.password_hash):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials")
+    await reset_login_throttle(form_data.username)
+    await log_action(db, user_id=user.user_id, action="LOGIN")
 
     return TokenResponse(
         access_token=create_access_token(user.user_id),
@@ -102,10 +112,12 @@ async def refresh_tokens(
 @router.post("/logout", status_code=status.HTTP_204_NO_CONTENT)
 async def logout(
     body: RefreshTokenRequest | None = None,
-    access_token: str = Depends(oauth2_scheme),
+    access_token: str | None = Depends(oauth2_scheme),
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_session),
 ) -> None:
+    if not access_token:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Not authenticated")
     settings = get_settings()
     if not settings.TOKEN_REVOCATION_ENABLED:
         return
@@ -127,14 +139,18 @@ async def logout(
                 user_id=payload.sub,
                 expires_at=datetime.fromtimestamp(payload.exp, tz=UTC),
             )
+    await log_action(db, user_id=current_user.user_id, action="LOGOUT")
 
 
 @router.post("/password-reset/request", status_code=status.HTTP_202_ACCEPTED)
+@limiter.limit("5/minute")
 async def request_password_reset(
+    request: Request,
     body: PasswordResetRequest,
     background_tasks: BackgroundTasks,
     db: AsyncSession = Depends(get_session),
 ) -> dict[str, str]:
+    _ = request
     user_result = await db.execute(select(User).where(User.email == body.email))
     user = user_result.scalars().first()
     if not user:
@@ -174,4 +190,5 @@ async def confirm_password_reset(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
     user.password_hash = hash_password(body.new_password)
     await db.commit()
+    await log_action(db, user_id=user.user_id, action="PASSWORD_RESET")
     return {"detail": "Password updated"}

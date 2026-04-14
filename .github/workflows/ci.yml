@@ -47,8 +47,11 @@ jobs:
       - name: Install dependencies
         run: uv sync --extra dev
 
-      - name: Run tests
-        run: uv run pytest -v
+      - name: Run tests with coverage
+        run: uv run pytest -v --cov=app --cov-report=xml
         env:
           DATABASE_URL: "sqlite+aiosqlite:///:memory:"
           APP_ENV: testing
+
+      - name: Security scan (pip-audit)
+        run: uv run pip install pip-audit && uv run pip-audit

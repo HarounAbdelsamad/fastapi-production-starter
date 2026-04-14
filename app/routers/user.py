@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.deps import get_current_user
-from app.db.database import get_session
+from app.db.database import get_read_session, get_session
 from app.models.user import User
 from app.schemas.pagination import PaginatedResponse, PaginationParams
 from app.schemas.user import UserCreate, UserResponse, UserUpdate
@@ -25,7 +25,7 @@ async def create_user(
 @router.get("/", response_model=PaginatedResponse[UserResponse])
 async def list_users(
     params: PaginationParams = Depends(),
-    db: AsyncSession = Depends(get_session),
+    db: AsyncSession = Depends(get_read_session),
     _current_user: User = Depends(get_current_user),
 ):
     return await user_service.get_all_users(db, params)
@@ -34,7 +34,7 @@ async def list_users(
 @router.get("/{user_id}", response_model=UserResponse)
 async def get_user(
     user_id: str,
-    db: AsyncSession = Depends(get_session),
+    db: AsyncSession = Depends(get_read_session),
     _current_user: User = Depends(get_current_user),
 ):
     user = await user_service.get_user(db, user_id)

@@ -1,14 +1,52 @@
 import logging
 
-from fastapi import Request
-from fastapi.responses import JSONResponse
+from fastapi import HTTPException, Request
+from fastapi.exceptions import RequestValidationError
+from starlette.status import HTTP_500_INTERNAL_SERVER_ERROR
+
+from app.core.errors import api_error
 
 logger = logging.getLogger(__name__)
 
 
-async def unhandled_exception_handler(request: Request, exc: Exception) -> JSONResponse:
+STATUS_TO_CODE = {
+    400: "BAD_REQUEST",
+    401: "UNAUTHORIZED",
+    403: "FORBIDDEN",
+    404: "NOT_FOUND",
+    409: "CONFLICT",
+    429: "TOO_MANY_REQUESTS",
+}
+
+
+async def unhandled_exception_handler(request: Request, exc: Exception):
     logger.exception("Unhandled error on %s %s", request.method, request.url.path)
-    return JSONResponse(
-        status_code=500,
-        content={"detail": "Internal server error"},
+    return api_error(
+        status_code=HTTP_500_INTERNAL_SERVER_ERROR,
+        code="INTERNAL_ERROR",
+        message="Internal server error",
+        request=request,
+    )
+
+
+async def http_exception_handler(request: Request, exc: HTTPException):
+    code = STATUS_TO_CODE.get(exc.status_code, "HTTP_ERROR")
+    message = exc.detail if isinstance(exc.detail, str) else "Request failed"
+    return api_error(status_code=exc.status_code, code=code, message=message, request=request)
+
+
+async def validation_exception_handler(request: Request, exc: RequestValidationError):
+    details = [
+        {
+            "field": ".".join(str(part) for part in err["loc"]),
+            "message": err["msg"],
+        }
+        for err in exc.errors()
+    ]
+    return api_error(
+        status_code=422,
+        code="VALIDATION_ERROR",
+        message="Validation failed",
+        details=details,
+        request=request,
     )

@@ -58,6 +58,35 @@ class Settings(BaseSettings):
     FRONTEND_URL: str = "http://localhost:3000"
 
     SCALE_TIER: str = "basic"
+    LOG_FORMAT: str = "text"
+
+    RATE_LIMIT_ENABLED: bool = False
+    RATE_LIMIT_DEFAULT: str = "60/minute"
+    RATE_LIMIT_AUTH: str = "10/minute"
+
+    METRICS_ENABLED: bool = False
+    SENTRY_DSN: str = ""
+    SENTRY_TRACES_SAMPLE_RATE: float = 0.1
+
+    LOGIN_MAX_ATTEMPTS: int = 5
+    LOGIN_LOCKOUT_SECONDS: int = 300
+    API_KEYS: list[str] = []
+
+    STORAGE_BACKEND: str = "local"
+    STORAGE_LOCAL_PATH: str = "./uploads"
+    S3_BUCKET_NAME: str = ""
+    S3_REGION: str = ""
+    S3_ACCESS_KEY: str = ""
+    S3_SECRET_KEY: str = ""
+    S3_ENDPOINT_URL: str = ""
+
+    WEBSOCKET_ENABLED: bool = False
+    FEATURE_FLAGS_ENABLED: bool = False
+
+    OAUTH_GOOGLE_CLIENT_ID: str = ""
+    OAUTH_GOOGLE_CLIENT_SECRET: str = ""
+    OAUTH_GITHUB_CLIENT_ID: str = ""
+    OAUTH_GITHUB_CLIENT_SECRET: str = ""
 
     @property
     def is_development(self) -> bool:

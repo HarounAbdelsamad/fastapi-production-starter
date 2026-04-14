@@ -16,7 +16,7 @@ def make_user_payload() -> dict[str, str]:
 
 async def auth_headers(client, payload: dict[str, str]) -> dict[str, str]:
     login = await client.post(
-        "/api/auth/login",
+        "/api/v1/auth/login",
         data={"username": payload["username"], "password": payload["password"]},
     )
     token = login.json()["access_token"]
@@ -26,7 +26,7 @@ async def auth_headers(client, payload: dict[str, str]) -> dict[str, str]:
 @pytest.mark.asyncio
 async def test_create_user(client):
     payload = make_user_payload()
-    resp = await client.post("/api/users/", json=payload)
+    resp = await client.post("/api/v1/users/", json=payload)
     assert resp.status_code == 201
     data = resp.json()
     assert data["user_id"] == payload["user_id"]
@@ -38,17 +38,17 @@ async def test_create_user(client):
 @pytest.mark.asyncio
 async def test_create_duplicate_user(client):
     payload = make_user_payload()
-    await client.post("/api/users/", json=payload)
-    resp = await client.post("/api/users/", json=payload)
+    await client.post("/api/v1/users/", json=payload)
+    resp = await client.post("/api/v1/users/", json=payload)
     assert resp.status_code == 409
 
 
 @pytest.mark.asyncio
 async def test_get_user(client):
     payload = make_user_payload()
-    await client.post("/api/users/", json=payload)
+    await client.post("/api/v1/users/", json=payload)
     headers = await auth_headers(client, payload)
-    resp = await client.get(f"/api/users/{payload['user_id']}", headers=headers)
+    resp = await client.get(f"/api/v1/users/{payload['user_id']}", headers=headers)
     assert resp.status_code == 200
     assert resp.json()["email"] == payload["email"]
 
@@ -56,18 +56,18 @@ async def test_get_user(client):
 @pytest.mark.asyncio
 async def test_get_user_not_found(client):
     payload = make_user_payload()
-    await client.post("/api/users/", json=payload)
+    await client.post("/api/v1/users/", json=payload)
     headers = await auth_headers(client, payload)
-    resp = await client.get("/api/users/nonexistent", headers=headers)
+    resp = await client.get("/api/v1/users/nonexistent", headers=headers)
     assert resp.status_code in (401, 404)
 
 
 @pytest.mark.asyncio
 async def test_list_users(client):
     payload = make_user_payload()
-    await client.post("/api/users/", json=payload)
+    await client.post("/api/v1/users/", json=payload)
     headers = await auth_headers(client, payload)
-    resp = await client.get("/api/users/?skip=0&limit=10", headers=headers)
+    resp = await client.get("/api/v1/users/?skip=0&limit=10", headers=headers)
     assert resp.status_code == 200
     data = resp.json()
     assert "items" in data
@@ -78,10 +78,10 @@ async def test_list_users(client):
 @pytest.mark.asyncio
 async def test_update_user(client):
     payload = make_user_payload()
-    await client.post("/api/users/", json=payload)
+    await client.post("/api/v1/users/", json=payload)
     headers = await auth_headers(client, payload)
     resp = await client.patch(
-        f"/api/users/{payload['user_id']}",
+        f"/api/v1/users/{payload['user_id']}",
         json={"username": "updated"},
         headers=headers,
     )
@@ -92,10 +92,10 @@ async def test_update_user(client):
 @pytest.mark.asyncio
 async def test_delete_user(client):
     payload = make_user_payload()
-    await client.post("/api/users/", json=payload)
+    await client.post("/api/v1/users/", json=payload)
     headers = await auth_headers(client, payload)
-    resp = await client.delete(f"/api/users/{payload['user_id']}", headers=headers)
+    resp = await client.delete(f"/api/v1/users/{payload['user_id']}", headers=headers)
     assert resp.status_code == 204
 
-    resp = await client.get(f"/api/users/{payload['user_id']}", headers=headers)
+    resp = await client.get(f"/api/v1/users/{payload['user_id']}", headers=headers)
     assert resp.status_code in (401, 404)

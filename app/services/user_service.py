@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -6,10 +8,13 @@ from app.core.security import hash_password
 from app.models.user import User
 from app.schemas.pagination import PaginatedResponse, PaginationParams
 from app.schemas.user import UserCreate, UserUpdate
+from app.services.audit_service import log_action
 
 
 async def get_user(db: AsyncSession, user_id: str) -> User | None:
-    result = await db.execute(select(User).where(User.user_id == user_id.strip()))
+    result = await db.execute(
+        select(User).where(User.user_id == user_id.strip(), User.deleted_at.is_(None))
+    )
     return result.scalars().first()
 
 
@@ -17,16 +22,20 @@ async def get_all_users(
     db: AsyncSession,
     params: PaginationParams,
 ) -> PaginatedResponse:
-    return await paginate(db, select(User).order_by(User.user_id), params)
+    return await paginate(
+        db, select(User).where(User.deleted_at.is_(None)).order_by(User.user_id), params
+    )
 
 
 async def get_user_by_username(db: AsyncSession, username: str) -> User | None:
-    result = await db.execute(select(User).where(User.username == username))
+    result = await db.execute(
+        select(User).where(User.username == username, User.deleted_at.is_(None))
+    )
     return result.scalars().first()
 
 
 async def get_user_by_email(db: AsyncSession, email: str) -> User | None:
-    result = await db.execute(select(User).where(User.email == email))
+    result = await db.execute(select(User).where(User.email == email, User.deleted_at.is_(None)))
     return result.scalars().first()
 
 
@@ -69,6 +78,7 @@ async def delete_user(db: AsyncSession, user_id: str) -> User | None:
     user = await get_user(db, user_id)
     if not user:
         return None
-    await db.delete(user)
+    user.deleted_at = datetime.utcnow()
     await db.commit()
+    await log_action(db, user_id=user.user_id, action="USER_SOFT_DELETE", resource=user.user_id)
     return user
