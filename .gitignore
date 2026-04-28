@@ -40,3 +40,7 @@ coverage.xml
 # pytest
 .pytest_cache/
 uploads/
+/fastapi-production-starter-plan.md
+/planned.md
+/planned2.md
+/.claude

@@ -2,7 +2,7 @@
 
 Template-grade FastAPI backend with enterprise-ready patterns and feature toggles.
 
-![CI](https://github.com/<your-username>/fastapi-production-starter/actions/workflows/ci.yml/badge.svg)
+![CI](https://github.com/HarounAbdelsamad/fastapi-production-starter/actions/workflows/ci.yml/badge.svg)
 ![Python](https://img.shields.io/badge/python-3.13%2B-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
@@ -14,7 +14,7 @@ Template-grade FastAPI backend with enterprise-ready patterns and feature toggle
 
 ## Quick start
 ```bash
-git clone https://github.com/<your-username>/fastapi-production-starter.git
+git clone https://github.com/HarounAbdelsamad/fastapi-production-starter.git
 cd fastapi-production-starter
 make install
 cp .env.example .env
