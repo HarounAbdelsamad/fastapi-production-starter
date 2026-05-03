@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from functools import lru_cache
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -88,13 +90,95 @@ class Settings(BaseSettings):
     OAUTH_GITHUB_CLIENT_ID: str = ""
     OAUTH_GITHUB_CLIENT_SECRET: str = ""
 
+    # -- Secrets backend (see docs/adr/004-pluggable-secrets.md) ------------
+    # Valid values: "env" (default), "vault", "aws"
+    SECRETS_BACKEND: str = "env"
+    # Vault-specific (only read when SECRETS_BACKEND=vault)
+    VAULT_ADDR: str = "http://localhost:8200"
+    VAULT_TOKEN: str = ""
+    VAULT_MOUNT: str = "secret"
+    VAULT_PATH: str = "app"
+    # AWS-specific (only read when SECRETS_BACKEND=aws)
+    AWS_SECRET_ID: str = ""
+    AWS_REGION: str = ""
+
+    # -- OpenTelemetry (see docs/adr/007-opentelemetry-default.md) -----------
+    # Set to an OTLP endpoint (e.g. "http://jaeger:4317") to export traces.
+    # Leave empty to use the noop exporter (zero overhead).
+    OTLP_ENDPOINT: str = ""
+    # Set to "true" to disable the OTel SDK entirely (removes all overhead).
+    OTEL_SDK_DISABLED: bool = False
+
     @property
     def is_development(self) -> bool:
         return self.APP_ENV == "development"
 
     @property
+    def is_production(self) -> bool:
+        return self.APP_ENV == "production"
+
+    @property
+    def is_testing(self) -> bool:
+        return self.APP_ENV == "testing"
+
+    @property
     def is_sqlite(self) -> bool:
         return self.DATABASE_URL.startswith("sqlite")
+
+    def validate_config(self) -> list[str]:
+        """Return a list of configuration error strings.
+
+        Called by ``make check-config`` and at startup in production.
+        Returns an empty list when the configuration is valid.
+        """
+        errors: list[str] = []
+
+        if self.is_production:
+            if self.SECRET_KEY in ("change-me-to-a-random-secret", ""):
+                errors.append("SECRET_KEY must be set to a strong random value in production")
+            if len(self.SECRET_KEY) < 64:
+                errors.append(
+                    f"SECRET_KEY is too short ({len(self.SECRET_KEY)} chars); "
+                    "minimum 64 characters required in production"
+                )
+
+        if self.CACHE_ENABLED and not self.REDIS_URL:
+            errors.append("REDIS_URL is required when CACHE_ENABLED=true")
+
+        if self.CELERY_ENABLED:
+            if not self.CELERY_BROKER_URL:
+                errors.append("CELERY_BROKER_URL is required when CELERY_ENABLED=true")
+            if not self.CELERY_RESULT_BACKEND:
+                errors.append("CELERY_RESULT_BACKEND is required when CELERY_ENABLED=true")
+
+        if self.STORAGE_BACKEND == "s3":
+            for key in ("S3_BUCKET_NAME", "S3_REGION", "S3_ACCESS_KEY", "S3_SECRET_KEY"):
+                if not getattr(self, key):
+                    errors.append(f"{key} is required when STORAGE_BACKEND=s3")
+
+        if self.MAIL_ENABLED:
+            for key in ("MAIL_USERNAME", "MAIL_PASSWORD", "MAIL_SERVER"):
+                if not getattr(self, key):
+                    errors.append(f"{key} is required when MAIL_ENABLED=true")
+
+        if self.OAUTH_GOOGLE_CLIENT_ID and not self.OAUTH_GOOGLE_CLIENT_SECRET:
+            errors.append(
+                "OAUTH_GOOGLE_CLIENT_SECRET is required when OAUTH_GOOGLE_CLIENT_ID is set"
+            )
+        if self.OAUTH_GITHUB_CLIENT_ID and not self.OAUTH_GITHUB_CLIENT_SECRET:
+            errors.append(
+                "OAUTH_GITHUB_CLIENT_SECRET is required when OAUTH_GITHUB_CLIENT_ID is set"
+            )
+
+        if self.SECRETS_BACKEND == "vault" and not self.VAULT_TOKEN:
+            errors.append(
+                "VAULT_TOKEN is required when SECRETS_BACKEND=vault "
+                "(or configure AppRole auth manually)"
+            )
+        if self.SECRETS_BACKEND == "aws" and not self.AWS_SECRET_ID:
+            errors.append("AWS_SECRET_ID is required when SECRETS_BACKEND=aws")
+
+        return errors
 
 
 @lru_cache

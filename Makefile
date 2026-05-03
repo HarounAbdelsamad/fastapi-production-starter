@@ -1,4 +1,5 @@
-.PHONY: install run test test-cov lint format format-check migrate migrate-new docker-up docker-down clean seed create-admin pre-commit-install
+.PHONY: install run test test-cov lint format format-check migrate migrate-new \
+        docker-up docker-down clean seed create-admin pre-commit-install check-config
 
 install:
 	uv sync --extra dev
@@ -46,3 +47,10 @@ create-admin:
 
 pre-commit-install:
 	uv run pre-commit install
+
+## Validate configuration for the current .env before deploying.
+## Usage: make check-config            (validates .env)
+##        make check-config ENV=.env.production
+##        make check-config STRICT=--strict
+check-config:
+	uv run cli check-config --env-file $(or $(ENV),.env) $(STRICT)
