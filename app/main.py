@@ -18,6 +18,7 @@ from app.core.exceptions import (
     unhandled_exception_handler,
     validation_exception_handler,
 )
+from app.core.idempotency import IdempotencyMiddleware
 from app.core.logging import setup_logging
 from app.core.middleware import RequestIDMiddleware, SecurityHeadersMiddleware
 from app.core.rate_limit import get_limiter
@@ -36,6 +37,7 @@ from app.routers import (
     roles,
     saml,
     user,
+    webhooks,
     ws,
 )
 
@@ -60,8 +62,15 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     logger.info("Starting %s (%s)", settings.APP_TITLE, settings.APP_ENV)
     await init_db()
     yield
+    # Graceful shutdown — Starlette waits for in-flight requests to finish
+    # before this code runs.  We just need to release shared resources.
+    logger.info(
+        "Shutting down %s — grace period %ss",
+        settings.APP_TITLE,
+        settings.SHUTDOWN_GRACE_SECONDS,
+    )
     await close_redis()
-    logger.info("Shutting down")
+    logger.info("Shutdown complete")
 
 
 def create_app() -> FastAPI:
@@ -88,6 +97,7 @@ def create_app() -> FastAPI:
     app.add_middleware(SecurityHeadersMiddleware)
     app.add_middleware(TrustedHostMiddleware, allowed_hosts=settings.TRUSTED_HOSTS)
     app.add_middleware(SlowAPIMiddleware)
+    app.add_middleware(IdempotencyMiddleware, ttl=settings.IDEMPOTENCY_TTL)
 
     app.state.limiter = get_limiter()
 
@@ -114,6 +124,8 @@ def create_app() -> FastAPI:
     app.include_router(roles.router, prefix="/api/v1", tags=["Roles & Permissions"])
     app.include_router(audit.router, prefix="/api/v1", tags=["Audit"])
     app.include_router(gdpr.router, prefix="/api/v1", tags=["GDPR"])
+    if settings.WEBHOOKS_ENABLED:
+        app.include_router(webhooks.router, prefix="/api/v1", tags=["Webhooks"])
     if settings.WEBSOCKET_ENABLED:
         app.include_router(ws.router, prefix="/api/v1", tags=["WebSocket"])
 

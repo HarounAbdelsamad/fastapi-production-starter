@@ -130,6 +130,16 @@ class Settings(BaseSettings):
     S2S_ENABLED: bool = False
     S2S_SERVICES: str = "{}"
 
+    # -- Operational patterns (Phase 6) -------------------------------------
+    # Idempotency key TTL in seconds (default 24 h).
+    IDEMPOTENCY_TTL: int = 86_400
+    # Seconds to wait after SIGTERM before forcing shutdown (uvicorn --timeout-graceful-shutdown).
+    SHUTDOWN_GRACE_SECONDS: int = 30
+    # Job queue backend: "celery" (default) or "rq".
+    JOB_QUEUE_BACKEND: str = "celery"
+    # Webhooks: enable outgoing webhook dispatch.
+    WEBHOOKS_ENABLED: bool = True
+
     @property
     def is_development(self) -> bool:
         return self.APP_ENV == "development"
