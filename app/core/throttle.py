@@ -43,3 +43,41 @@ async def reset_login_throttle(username: str) -> None:
         await redis.delete(key)
         return
     _attempts.pop(username, None)
+
+
+# ---------------------------------------------------------------------------
+# Advanced rate-limit key functions for SlowAPI
+# ---------------------------------------------------------------------------
+# Usage with per-endpoint limits:
+#
+#   from app.core.throttle import get_user_key
+#   from app.core.rate_limit import limiter
+#
+#   @router.post("/send-email")
+#   @limiter.limit("5/minute", key_func=get_user_key)
+#   async def send_email(request: Request, ...): ...
+#
+# See docs/compliance/rate-limiting.md for the full three-layer guide.
+
+
+def _ip_fallback(request) -> str:
+    forwarded = request.headers.get("X-Forwarded-For")
+    if forwarded:
+        return forwarded.split(",")[0].strip()
+    return request.client.host if request.client else "unknown"
+
+
+def get_user_key(request) -> str:
+    """Per-user rate-limit key. Falls back to IP for unauthenticated requests."""
+    user = getattr(request.state, "user", None)
+    if user and hasattr(user, "user_id"):
+        return f"user:{user.user_id}"
+    return _ip_fallback(request)
+
+
+def get_tenant_key(request) -> str:
+    """Per-tenant rate-limit key. Falls back to IP when tenant context is absent."""
+    user = getattr(request.state, "user", None)
+    if user and hasattr(user, "tenant_id") and user.tenant_id:
+        return f"tenant:{user.tenant_id}"
+    return _ip_fallback(request)

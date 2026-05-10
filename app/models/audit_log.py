@@ -17,3 +17,6 @@ class AuditLog(Base):
     detail: Mapped[str | None] = mapped_column(String, nullable=True)
     ip_address: Mapped[str | None] = mapped_column(String, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    # HMAC-SHA256 over the canonical row string — proves the row was not tampered with
+    # after write. See app/services/audit_service.verify_audit_log().
+    hmac_signature: Mapped[str] = mapped_column(String, default="")

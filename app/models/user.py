@@ -1,10 +1,12 @@
 from sqlalchemy import String
 from sqlalchemy.orm import Mapped, mapped_column
 
+from app.core.pii import mark_pii
 from app.db.database import Base
 from app.db.mixins import SoftDeleteMixin
 
 
+@mark_pii("email", "phone_number")
 class User(Base, SoftDeleteMixin):
     __tablename__ = "users"
 

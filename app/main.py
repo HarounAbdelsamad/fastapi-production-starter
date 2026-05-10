@@ -21,9 +21,23 @@ from app.core.exceptions import (
 from app.core.logging import setup_logging
 from app.core.middleware import RequestIDMiddleware, SecurityHeadersMiddleware
 from app.core.rate_limit import get_limiter
+from app.core.telemetry import setup_telemetry
 from app.db.database import init_db
 from app.internal import admin
-from app.routers import auth, features, files, health, oauth, user, ws
+from app.routers import (
+    api_keys,
+    audit,
+    auth,
+    features,
+    files,
+    gdpr,
+    health,
+    oauth,
+    roles,
+    saml,
+    user,
+    ws,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -31,7 +45,10 @@ logger = logging.getLogger(__name__)
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     settings = get_settings()
-    setup_logging(debug=settings.DEBUG, log_format=settings.LOG_FORMAT)
+    setup_logging(
+        debug=settings.DEBUG, log_format=settings.LOG_FORMAT, pii_redact=settings.LOG_PII_REDACT
+    )
+    setup_telemetry(app, settings=settings)
     if settings.SENTRY_DSN:
         import sentry_sdk
 
@@ -93,6 +110,10 @@ def create_app() -> FastAPI:
     app.include_router(admin.router, prefix="/api/v1", tags=["Admin"])
     app.include_router(features.router, prefix="/api/v1", tags=["Features"])
     app.include_router(files.router, prefix="/api/v1/files", tags=["Files"])
+    app.include_router(api_keys.router, prefix="/api/v1", tags=["API Keys"])
+    app.include_router(roles.router, prefix="/api/v1", tags=["Roles & Permissions"])
+    app.include_router(audit.router, prefix="/api/v1", tags=["Audit"])
+    app.include_router(gdpr.router, prefix="/api/v1", tags=["GDPR"])
     if settings.WEBSOCKET_ENABLED:
         app.include_router(ws.router, prefix="/api/v1", tags=["WebSocket"])
 
@@ -102,6 +123,7 @@ def create_app() -> FastAPI:
         Instrumentator().instrument(app).expose(app, endpoint="/metrics", include_in_schema=False)
     if settings.OAUTH_GOOGLE_CLIENT_ID or settings.OAUTH_GITHUB_CLIENT_ID:
         app.include_router(oauth.router, prefix="/api/v1/auth", tags=["OAuth"])
+    app.include_router(saml.router, prefix="/api/v1/auth", tags=["SAML"])
 
     return app
 

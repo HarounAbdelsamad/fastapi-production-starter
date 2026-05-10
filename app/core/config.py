@@ -108,6 +108,27 @@ class Settings(BaseSettings):
     OTLP_ENDPOINT: str = ""
     # Set to "true" to disable the OTel SDK entirely (removes all overhead).
     OTEL_SDK_DISABLED: bool = False
+    # Fraction of traces to sample (1.0 = 100%, 0.1 = 10%). Uses ParentBased sampler.
+    OTEL_SAMPLE_RATE: float = 1.0
+    # Set to "true" to redact PII patterns (email, phone, credit card) from logs.
+    LOG_PII_REDACT: bool = False
+
+    # -- SAML 2.0 (see docs/identity/saml-setup.md) -------------------------
+    # Install python3-saml to enable: uv pip install 'python3-saml>=1.16.0'
+    SAML_ENABLED: bool = False
+    BASE_URL: str = "http://localhost:8000"
+    SAML_IDP_ENTITY_ID: str = ""
+    SAML_IDP_SSO_URL: str = ""
+    SAML_IDP_SLO_URL: str = ""
+    SAML_IDP_CERT: str = ""
+    SAML_SP_CERT: str = ""
+    SAML_SP_KEY: str = ""
+
+    # -- Service-to-service auth (see docs/identity/s2s-auth.md) ------------
+    # S2S_SERVICES is a JSON object mapping service IDs to shared secrets.
+    # Example: {"analytics-service": "mysecret", "worker": "anothersecret"}
+    S2S_ENABLED: bool = False
+    S2S_SERVICES: str = "{}"
 
     @property
     def is_development(self) -> bool:

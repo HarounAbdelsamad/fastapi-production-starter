@@ -76,9 +76,12 @@ async def init_db() -> None:
     async with _tables_lock:
         if _tables_created:
             return
+        from app.models.api_key import ApiKey  # noqa: F401
         from app.models.audit_log import AuditLog  # noqa: F401
         from app.models.feature_flag import FeatureFlag  # noqa: F401
+        from app.models.oauth_account import OAuthAccount  # noqa: F401
         from app.models.revoked_token import RevokedToken  # noqa: F401
+        from app.models.role import Permission, Role, RolePermission, UserRole  # noqa: F401
         from app.models.user import User  # noqa: F401 — register models
 
         async with engine.begin() as conn:
