@@ -1,4 +1,4 @@
-from sqlalchemy import Boolean, String
+from sqlalchemy import Boolean, ForeignKey, Integer, String, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.db.database import Base
@@ -10,3 +10,20 @@ class FeatureFlag(Base):
     key: Mapped[str] = mapped_column(String, primary_key=True)
     enabled: Mapped[bool] = mapped_column(Boolean, default=False)
     description: Mapped[str | None] = mapped_column(String, nullable=True)
+
+
+class FeatureFlagOverride(Base):
+    """Per-user or per-tenant override for a feature flag.
+
+    Lookup priority: user override → tenant override → global flag.
+    ``subject_type`` is either ``"user"`` or ``"tenant"``.
+    """
+
+    __tablename__ = "feature_flag_overrides"
+    __table_args__ = (UniqueConstraint("key", "subject_type", "subject_id"),)
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    key: Mapped[str] = mapped_column(ForeignKey("feature_flags.key"), nullable=False)
+    subject_type: Mapped[str] = mapped_column(String, nullable=False)  # "user" | "tenant"
+    subject_id: Mapped[str] = mapped_column(String, nullable=False)
+    enabled: Mapped[bool] = mapped_column(Boolean, nullable=False)
