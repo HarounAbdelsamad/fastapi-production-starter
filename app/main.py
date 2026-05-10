@@ -18,12 +18,28 @@ from app.core.exceptions import (
     unhandled_exception_handler,
     validation_exception_handler,
 )
+from app.core.idempotency import IdempotencyMiddleware
 from app.core.logging import setup_logging
 from app.core.middleware import RequestIDMiddleware, SecurityHeadersMiddleware
 from app.core.rate_limit import get_limiter
+from app.core.telemetry import setup_telemetry
 from app.db.database import init_db
 from app.internal import admin
-from app.routers import auth, features, files, health, oauth, user, ws
+from app.routers import (
+    api_keys,
+    audit,
+    auth,
+    features,
+    files,
+    gdpr,
+    health,
+    oauth,
+    roles,
+    saml,
+    user,
+    webhooks,
+    ws,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -31,7 +47,10 @@ logger = logging.getLogger(__name__)
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     settings = get_settings()
-    setup_logging(debug=settings.DEBUG, log_format=settings.LOG_FORMAT)
+    setup_logging(
+        debug=settings.DEBUG, log_format=settings.LOG_FORMAT, pii_redact=settings.LOG_PII_REDACT
+    )
+    setup_telemetry(app, settings=settings)
     if settings.SENTRY_DSN:
         import sentry_sdk
 
@@ -43,8 +62,15 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     logger.info("Starting %s (%s)", settings.APP_TITLE, settings.APP_ENV)
     await init_db()
     yield
+    # Graceful shutdown — Starlette waits for in-flight requests to finish
+    # before this code runs.  We just need to release shared resources.
+    logger.info(
+        "Shutting down %s — grace period %ss",
+        settings.APP_TITLE,
+        settings.SHUTDOWN_GRACE_SECONDS,
+    )
     await close_redis()
-    logger.info("Shutting down")
+    logger.info("Shutdown complete")
 
 
 def create_app() -> FastAPI:
@@ -71,6 +97,7 @@ def create_app() -> FastAPI:
     app.add_middleware(SecurityHeadersMiddleware)
     app.add_middleware(TrustedHostMiddleware, allowed_hosts=settings.TRUSTED_HOSTS)
     app.add_middleware(SlowAPIMiddleware)
+    app.add_middleware(IdempotencyMiddleware, ttl=settings.IDEMPOTENCY_TTL)
 
     app.state.limiter = get_limiter()
 
@@ -93,6 +120,12 @@ def create_app() -> FastAPI:
     app.include_router(admin.router, prefix="/api/v1", tags=["Admin"])
     app.include_router(features.router, prefix="/api/v1", tags=["Features"])
     app.include_router(files.router, prefix="/api/v1/files", tags=["Files"])
+    app.include_router(api_keys.router, prefix="/api/v1", tags=["API Keys"])
+    app.include_router(roles.router, prefix="/api/v1", tags=["Roles & Permissions"])
+    app.include_router(audit.router, prefix="/api/v1", tags=["Audit"])
+    app.include_router(gdpr.router, prefix="/api/v1", tags=["GDPR"])
+    if settings.WEBHOOKS_ENABLED:
+        app.include_router(webhooks.router, prefix="/api/v1", tags=["Webhooks"])
     if settings.WEBSOCKET_ENABLED:
         app.include_router(ws.router, prefix="/api/v1", tags=["WebSocket"])
 
@@ -102,6 +135,7 @@ def create_app() -> FastAPI:
         Instrumentator().instrument(app).expose(app, endpoint="/metrics", include_in_schema=False)
     if settings.OAUTH_GOOGLE_CLIENT_ID or settings.OAUTH_GITHUB_CLIENT_ID:
         app.include_router(oauth.router, prefix="/api/v1/auth", tags=["OAuth"])
+    app.include_router(saml.router, prefix="/api/v1/auth", tags=["SAML"])
 
     return app
 

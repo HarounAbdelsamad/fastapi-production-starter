@@ -69,5 +69,109 @@ services:
       - redis
       - rabbitmq
 
+  # ── Keycloak (SAML 2.0 demo IdP) ─────────────────────────────────────────
+  # Start with: docker compose --profile saml up
+  # Admin UI: http://localhost:8080  (admin / admin)
+  # See docs/identity/saml-setup.md for realm + client configuration.
+  keycloak:
+    image: quay.io/keycloak/keycloak:24.0
+    profiles: ["saml"]
+    container_name: fastapi_keycloak
+    command: start-dev
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://postgres:5432/keycloak
+      KC_DB_USERNAME: postgres
+      KC_DB_PASSWORD: postgres
+      KC_HOSTNAME_STRICT: "false"
+      KC_HTTP_ENABLED: "true"
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+
+  # ── Observability stack ───────────────────────────────────────────────────
+  # Start with: docker compose --profile observability up
+  # Jaeger UI:    http://localhost:16686
+  # Prometheus:   http://localhost:9090
+  # Grafana:      http://localhost:3000  (admin / admin)
+  # Loki:         internal only (queried via Grafana)
+  #
+  # Wire the API: set OTLP_ENDPOINT=http://jaeger:4317 and METRICS_ENABLED=true
+  # in your .env before starting the observability profile.
+  jaeger:
+    image: jaegertracing/all-in-one:1.57
+    profiles: ["observability"]
+    container_name: fastapi_jaeger
+    environment:
+      COLLECTOR_OTLP_ENABLED: "true"
+    ports:
+      - "16686:16686"   # Jaeger UI
+      - "4317:4317"     # OTLP gRPC (traces in)
+      - "4318:4318"     # OTLP HTTP (traces in)
+
+  prometheus:
+    image: prom/prometheus:v2.52.0
+    profiles: ["observability"]
+    container_name: fastapi_prometheus
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.path=/prometheus
+      - --web.console.libraries=/etc/prometheus/console_libraries
+      - --web.console.templates=/etc/prometheus/consoles
+    volumes:
+      - ./monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - promdata:/prometheus
+    ports:
+      - "9090:9090"
+    depends_on:
+      - api
+
+  loki:
+    image: grafana/loki:2.9.8
+    profiles: ["observability"]
+    container_name: fastapi_loki
+    command: -config.file=/etc/loki/local-config.yaml
+    volumes:
+      - ./monitoring/loki/local-config.yaml:/etc/loki/local-config.yaml:ro
+      - lokidata:/loki
+    ports:
+      - "3100:3100"
+
+  promtail:
+    image: grafana/promtail:2.9.8
+    profiles: ["observability"]
+    container_name: fastapi_promtail
+    volumes:
+      - ./monitoring/promtail/config.yaml:/etc/promtail/config.yaml:ro
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+    command: -config.file=/etc/promtail/config.yaml
+    depends_on:
+      - loki
+
+  grafana:
+    image: grafana/grafana:10.4.3
+    profiles: ["observability"]
+    container_name: fastapi_grafana
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: admin
+      GF_USERS_ALLOW_SIGN_UP: "false"
+    volumes:
+      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./monitoring/grafana/dashboards:/var/lib/grafana/dashboards:ro
+      - grafanadata:/var/lib/grafana
+    ports:
+      - "3000:3000"
+    depends_on:
+      - prometheus
+      - loki
+      - jaeger
+
 volumes:
   pgdata:
+  promdata:
+  lokidata:
+  grafanadata:

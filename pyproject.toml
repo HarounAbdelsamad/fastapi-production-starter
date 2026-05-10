@@ -23,20 +23,28 @@ dependencies = [
     "asyncpg>=0.31.0",
     "aiomysql>=0.3.2",
     "alembic>=1.18.4",
-    "celery>=5.3.0",
+    "celery>=5.6.3",
     "email-validator>=2.3.0",
-    "fastapi-mail>=1.4.1",
+    "fastapi-mail>=1.6.3",
     "motor>=3.3.0",
-    "pydantic>=2.7.0",
+    "pydantic>=2.13.3",
     "pydantic-settings>=2.3.0",
-    "pyjwt>=2.8.0",
+    "pyjwt>=2.12.1",
     "prometheus-fastapi-instrumentator>=7.1.0",
-    "python-multipart>=0.0.9",
+    "python-multipart>=0.0.27",
     "python-dotenv>=1.0.0",
     "redis[hiredis]>=5.0.0",
-    "sentry-sdk[fastapi]>=2.0.0",
+    "sentry-sdk[fastapi]>=2.59.0",
     "slowapi>=0.1.9",
-    "typer>=0.12.0",
+    "typer>=0.25.1",
+    # OpenTelemetry — wired in by default with noop exporter; set OTLP_ENDPOINT to export
+    "opentelemetry-sdk>=1.25.0",
+    "opentelemetry-exporter-otlp-proto-grpc>=1.25.0",
+    "opentelemetry-instrumentation-fastapi>=0.46b0",
+    "opentelemetry-instrumentation-sqlalchemy>=0.46b0",
+    "opentelemetry-instrumentation-redis>=0.46b0",
+    "opentelemetry-instrumentation-celery>=0.46b0",
+    "opentelemetry-instrumentation-logging>=0.46b0",
 ]
 
 [project.scripts]
@@ -51,6 +59,10 @@ dev = [
     "pre-commit>=4.6.0",
     "ruff>=0.15.12",
 ]
+# SAML support (requires xmlsec1 system library on Linux/Mac)
+# On Ubuntu: apt-get install -y xmlsec1 libxmlsec1-dev pkg-config
+# Then: uv sync --extra saml
+saml = ["python3-saml>=1.16.0"]
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"

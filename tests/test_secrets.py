@@ -1,6 +1,5 @@
 """Tests for the SecretsProvider protocol and built-in implementations."""
 
-import os
 
 import pytest
 

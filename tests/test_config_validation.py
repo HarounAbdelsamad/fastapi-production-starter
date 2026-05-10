@@ -1,10 +1,8 @@
 """Tests for Settings.validate_config() and migration helper utilities."""
 
-import pytest
 
 from app.core.config import Settings
 from app.db.migration_helpers import BackfillProgress, expand_contract_checklist
-
 
 # ---------------------------------------------------------------------------
 # Settings.validate_config
@@ -57,7 +55,13 @@ class TestValidateConfig:
         assert any("CELERY_BROKER_URL" in e for e in errors)
 
     def test_s3_backend_missing_keys_errors(self):
-        s = self._make_settings(STORAGE_BACKEND="s3", S3_BUCKET_NAME="", S3_REGION="", S3_ACCESS_KEY="", S3_SECRET_KEY="")
+        s = self._make_settings(
+            STORAGE_BACKEND="s3",
+            S3_BUCKET_NAME="",
+            S3_REGION="",
+            S3_ACCESS_KEY="",
+            S3_SECRET_KEY="",
+        )
         errors = s.validate_config()
         assert len([e for e in errors if "S3_" in e]) >= 1
 
