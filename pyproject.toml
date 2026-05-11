@@ -39,7 +39,7 @@ dependencies = [
     "typer>=0.25.1",
     # OpenTelemetry — wired in by default with noop exporter; set OTLP_ENDPOINT to export
     "opentelemetry-sdk>=1.25.0",
-    "opentelemetry-exporter-otlp-proto-grpc>=1.25.0",
+    "opentelemetry-exporter-otlp-proto-grpc>=1.41.1",
     "opentelemetry-instrumentation-fastapi>=0.46b0",
     "opentelemetry-instrumentation-sqlalchemy>=0.46b0",
     "opentelemetry-instrumentation-redis>=0.46b0",
