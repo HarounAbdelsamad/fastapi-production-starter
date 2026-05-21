@@ -53,14 +53,15 @@ async def client():
     get_settings.cache_clear()
 
     # Reset engine cache so the new DATABASE_URL takes effect.
+    # Always reset — even for Postgres/MySQL — so each test gets a fresh
+    # connection pool tied to the current event loop (avoids "Future attached
+    # to a different loop" errors with asyncpg/aiomysql).
     from app.db import database as _db
 
-    if db_path is not None:
-        # Fresh SQLite file: always start with a clean engine.
-        _db.engine = None
-        _db.SessionLocal = None
-        _db._tables_created = False
-        _db._current_db_url = None
+    _db.engine = None
+    _db.SessionLocal = None
+    _db._tables_created = False
+    _db._current_db_url = None
 
     from app.main import create_app
 
