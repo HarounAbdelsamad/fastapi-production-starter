@@ -5,9 +5,9 @@
 > All wired. All toggleable. Off by default.
 
 [![CI](https://github.com/HarounAbdelsamad/fastapi-production-starter/actions/workflows/ci.yml/badge.svg)](https://github.com/HarounAbdelsamad/fastapi-production-starter/actions)
+[![Docs](https://img.shields.io/badge/docs-GitHub%20Pages-blue)](https://harounabdelsamad.github.io/fastapi-production-starter/)
 [![Python 3.13+](https://img.shields.io/badge/python-3.13%2B-blue)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
-[![Docs](https://img.shields.io/badge/docs-architecture%20%2B%20ADRs-informational)](docs/architecture/overview.md)
 
 ## Quickstart
 
@@ -84,8 +84,8 @@ These people evaluate templates by cloning and running the test suite, reading t
 |---|---|---|
 | JWT auth with refresh tokens | ✓ | always on |
 | OAuth 2.0 (Google, GitHub) | ✓ | `OAUTH_*_ENABLED` |
-| SAML 2.0 (Keycloak demo) | roadmap v0.1 | `SAML_ENABLED` |
-| API key auth (issue / rotate / revoke) | roadmap v0.1 | — |
+| SAML 2.0 (Keycloak demo) | ✓ | `SAML_ENABLED` |
+| API key auth (issue / rotate / revoke) | ✓ | `APIKEY_ENABLED` |
 | RBAC with role hierarchy | ✓ | always on |
 | Service-to-service auth | roadmap v0.1 | — |
 | Password reset | ✓ | — |
@@ -97,7 +97,7 @@ These people evaluate templates by cloning and running the test suite, reading t
 | Multi-DB (Postgres / MySQL / SQLite) | ✓ | CI-tested; limitations documented |
 | SQLAlchemy 2.0 + async sessions | ✓ | |
 | Alembic migrations | ✓ | with downgrade support |
-| Zero-downtime migration playbook | roadmap v0.1 | docs + helper utilities |
+| Zero-downtime migration playbook | ✓ | docs + `migration_helpers.py` |
 | Multi-tenancy (row-level isolation) | ✓ | see `docs/multi-tenancy.md` |
 | Soft delete pattern | ✓ | optional |
 
@@ -110,7 +110,7 @@ These people evaluate templates by cloning and running the test suite, reading t
 | Structured JSON logging | ✓ | always on |
 | Trace ID in every log line | ✓ | always on |
 | Health endpoints (`/health/live`, `/health/ready`) | ✓ | always on |
-| Grafana dashboard | roadmap v0.1 | |
+| Grafana dashboard | planned v0.2 | |
 
 ### Compliance & Security
 
@@ -133,9 +133,11 @@ These people evaluate templates by cloning and running the test suite, reading t
 | Redis cache | ✓ | `CACHE_ENABLED` |
 | WebSocket support | ✓ | `WEBSOCKET_ENABLED` |
 | File storage (local / S3) | ✓ | `STORAGE_BACKEND` |
-| Idempotency keys | roadmap v0.1 | |
-| Circuit breakers | roadmap v0.1 | |
-| Outgoing webhooks | roadmap v0.1 | |
+| Idempotency keys | ✓ | `Idempotency-Key` header middleware |
+| Circuit breakers | ✓ | async three-state, `asyncio.Lock` |
+| Outgoing webhooks | ✓ | HMAC-signed, exponential retry |
+| Per-user / per-tenant feature overrides | ✓ | Redis-cached, 60s TTL |
+| Graceful shutdown | ✓ | `SHUTDOWN_GRACE_SECONDS` |
 
 ---
 
@@ -227,19 +229,27 @@ Major design choices are documented as ADRs in [`docs/adr/`](docs/adr/):
 
 ## Roadmap
 
-**v0.1.0** (in progress):
+**v0.1.0** (complete):
 
-- [ ] SAML 2.0 with Keycloak demo IdP
-- [ ] API key auth (issue, rotate, revoke)
-- [ ] Zero-downtime migration playbook and helpers
-- [ ] Service-to-service auth pattern
-- [ ] Grafana dashboard JSON
-- [ ] CI matrix: Postgres / MySQL / SQLite
-- [ ] MkDocs documentation site
+- [x] SAML 2.0 with Keycloak demo IdP
+- [x] API key auth (issue, rotate, revoke)
+- [x] Zero-downtime migration playbook and helpers
+- [x] CI matrix: Postgres / MySQL / SQLite
+- [x] Background jobs (JobQueue protocol + Celery/RQ adapters)
+- [x] Outgoing webhooks (HMAC-signed, exponential retry, delivery log)
+- [x] Idempotency key middleware (Redis-backed)
+- [x] Circuit breaker reference implementation
+- [x] Feature flag per-user/tenant overrides (Redis-cached)
+- [x] MkDocs documentation site (GitHub Pages)
+- [x] Multi-arch Docker image (GHCR, linux/amd64 + linux/arm64)
+- [x] SECURITY.md + OWASP Top-10 coverage table
+- [x] Cookiecutter template
 
 **v0.2.0** (planned):
 
+- Service-to-service auth pattern
 - SCIM provisioning hooks
+- Grafana dashboard JSON
 - gRPC support
 - Kubernetes reference deployment YAMLs
 - Azure AD / Entra ID SAML integration guide
@@ -302,13 +312,17 @@ uv run cli create-admin --email ...  # create an admin user
 
 ## Documentation
 
-- [`docs/architecture/overview.md`](docs/architecture/overview.md) — system architecture and layer descriptions
-- [`docs/architecture/decisions.md`](docs/architecture/decisions.md) — ADR index
-- [`docs/adr/`](docs/adr/) — all 12 Architecture Decision Records
-- [`docs/multi-tenancy.md`](docs/multi-tenancy.md) — multi-tenancy pattern
-- [`docs/oauth.md`](docs/oauth.md) — OAuth provider setup
-- [`docs/deployment.md`](docs/deployment.md) — deployment guide
-- [`docs/migration-from-tiangolo.md`](docs/migration-from-tiangolo.md) — migrating from tiangolo's full-stack template
+Full docs at **[harounabdelsamad.github.io/fastapi-production-starter](https://harounabdelsamad.github.io/fastapi-production-starter/)** (built with MkDocs Material, deployed to GitHub Pages).
+
+Key doc sections:
+
+- [Getting Started](docs/getting-started.md) — install, run, Docker stack
+- [Architecture overview](docs/architecture/overview.md) — system diagram, layer descriptions
+- [ADRs](docs/adr/) — all 12 Architecture Decision Records
+- [Operations guides](docs/operations/) — jobs, webhooks, idempotency, circuit breakers, feature flags
+- [Compliance](docs/compliance/) — audit log, GDPR, PII tagging
+- [Recipes](docs/recipes.md) — how-to walkthroughs for common tasks
+- [FAQ](docs/faq.md) — common questions answered
 
 ---
 
