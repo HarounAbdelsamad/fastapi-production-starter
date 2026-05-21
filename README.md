@@ -23,7 +23,7 @@ make run
 Full observability + identity stack (requires Docker):
 
 ```bash
-make docker-up   # Postgres + Redis + Prometheus + Grafana + Jaeger (planned)
+make docker-up   # Postgres + Redis + Prometheus + Grafana + Jaeger + Loki
 ```
 
 ---
@@ -33,7 +33,7 @@ make docker-up   # Postgres + Redis + Prometheus + Grafana + Jaeger (planned)
 | Feature | **this template** | tiangolo/full-stack-fastapi | vstorm-co | plain FastAPI |
 |---|---|---|---|---|
 | **Target audience** | Enterprise backend teams | Indie / startup full-stack | Indie SaaS / AI agents | Roll your own |
-| **SAML 2.0 SSO** | ✓ (v0.1 roadmap) | ✗ | ✗ | ✗ |
+| **SAML 2.0 SSO** | ✓ | ✗ | ✗ | ✗ |
 | **Multi-DB** (Postgres/MySQL/SQLite) | ✓ CI-tested | Postgres only | Postgres only | — |
 | **OpenTelemetry** | ✓ default | ✗ | ✗ | — |
 | **Audit log** (HMAC-signed) | ✓ | ✗ | ✗ | — |
@@ -41,7 +41,7 @@ make docker-up   # Postgres + Redis + Prometheus + Grafana + Jaeger (planned)
 | **Zero-downtime migrations** | ✓ documented playbook | ✗ | ✗ | — |
 | **Multi-tenancy** (row-level) | ✓ | ✗ | ✓ | — |
 | **RBAC with hierarchy** | ✓ | basic | ✓ | — |
-| **API key auth** | ✓ (v0.1 roadmap) | ✗ | ✗ | — |
+| **API key auth** | ✓ | ✗ | ✗ | — |
 | **Architecture Decision Records** | 12 ADRs | ✗ | ✗ | — |
 | **Frontend included** | ✗ | ✓ React + Vite | ✗ | — |
 
@@ -87,7 +87,7 @@ These people evaluate templates by cloning and running the test suite, reading t
 | SAML 2.0 (Keycloak demo) | ✓ | `SAML_ENABLED` |
 | API key auth (issue / rotate / revoke) | ✓ | `APIKEY_ENABLED` |
 | RBAC with role hierarchy | ✓ | always on |
-| Service-to-service auth | roadmap v0.1 | — |
+| Service-to-service auth (HMAC-signed) | ✓ | `S2S_ENABLED` |
 | Password reset | ✓ | — |
 
 ### Data & Persistence
@@ -247,7 +247,6 @@ Major design choices are documented as ADRs in [`docs/adr/`](docs/adr/):
 
 **v0.2.0** (planned):
 
-- Service-to-service auth pattern
 - SCIM provisioning hooks
 - Grafana dashboard JSON
 - gRPC support
