@@ -36,7 +36,9 @@ async def http_exception_handler(request: Request, exc: HTTPException) -> JSONRe
     return api_error(status_code=exc.status_code, code=code, message=message, request=request)
 
 
-async def validation_exception_handler(request: Request, exc: RequestValidationError) -> JSONResponse:
+async def validation_exception_handler(
+    request: Request, exc: RequestValidationError
+) -> JSONResponse:
     details = [
         {
             "field": ".".join(str(part) for part in err["loc"]),
