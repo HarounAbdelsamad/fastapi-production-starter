@@ -17,6 +17,7 @@ Consumers verify the signature with::
     expected = "sha256=" + hmac.new(secret.encode(), body, hashlib.sha256).hexdigest()
     assert hmac.compare_digest(expected, request.headers["X-Webhook-Signature"])
 """
+
 from __future__ import annotations
 
 import hashlib
@@ -61,16 +62,12 @@ async def register_endpoint(
 
 
 async def list_endpoints(db: AsyncSession) -> list[WebhookEndpoint]:
-    result = await db.execute(
-        select(WebhookEndpoint).order_by(WebhookEndpoint.created_at)
-    )
+    result = await db.execute(select(WebhookEndpoint).order_by(WebhookEndpoint.created_at))
     return list(result.scalars().all())
 
 
 async def delete_endpoint(db: AsyncSession, endpoint_id: str) -> bool:
-    result = await db.execute(
-        select(WebhookEndpoint).where(WebhookEndpoint.id == endpoint_id)
-    )
+    result = await db.execute(select(WebhookEndpoint).where(WebhookEndpoint.id == endpoint_id))
     ep = result.scalars().first()
     if ep is None:
         return False
@@ -79,17 +76,13 @@ async def delete_endpoint(db: AsyncSession, endpoint_id: str) -> bool:
     return True
 
 
-async def dispatch_event(
-    db: AsyncSession, event: str, payload: dict
-) -> list[WebhookDelivery]:
+async def dispatch_event(db: AsyncSession, event: str, payload: dict) -> list[WebhookDelivery]:
     """Send *event* to all active subscribed endpoints.
 
     Returns the delivery records (one per endpoint).  Does *not* raise on
     delivery failure — failures are recorded in the delivery log.
     """
-    result = await db.execute(
-        select(WebhookEndpoint).where(WebhookEndpoint.active.is_(True))
-    )
+    result = await db.execute(select(WebhookEndpoint).where(WebhookEndpoint.active.is_(True)))
     endpoints = result.scalars().all()
 
     deliveries: list[WebhookDelivery] = []
@@ -113,9 +106,7 @@ async def dispatch_event(
     return deliveries
 
 
-async def _deliver(
-    db: AsyncSession, delivery: WebhookDelivery, endpoint: WebhookEndpoint
-) -> None:
+async def _deliver(db: AsyncSession, delivery: WebhookDelivery, endpoint: WebhookEndpoint) -> None:
     delivery.attempts += 1
     signature = _sign(delivery.payload, endpoint.secret)
     headers = {
@@ -126,9 +117,7 @@ async def _deliver(
     }
     try:
         async with httpx.AsyncClient(timeout=_TIMEOUT) as client:
-            resp = await client.post(
-                endpoint.url, content=delivery.payload, headers=headers
-            )
+            resp = await client.post(endpoint.url, content=delivery.payload, headers=headers)
         delivery.response_status = resp.status_code
         delivery.response_body = resp.text[:2000]
         if resp.is_success:
@@ -149,9 +138,7 @@ def _schedule_retry(delivery: WebhookDelivery) -> None:
     else:
         # 30 s, 120 s, 480 s, 1920 s (≈ 32 min)
         delay = int(30 * math.pow(4, delivery.attempts - 1))
-        delivery.next_retry_at = datetime.now(UTC).replace(tzinfo=None) + timedelta(
-            seconds=delay
-        )
+        delivery.next_retry_at = datetime.now(UTC).replace(tzinfo=None) + timedelta(seconds=delay)
         delivery.status = "pending"
 
 

@@ -1,7 +1,6 @@
 """Tests for the idempotency middleware."""
 
 
-
 class TestIdempotencyMiddleware:
     async def test_post_without_key_passes_through(self, client):
         resp = await client.post("/api/v1/auth/login", json={"username": "x", "password": "y"})
@@ -9,9 +8,7 @@ class TestIdempotencyMiddleware:
         assert "X-Idempotent-Replayed" not in resp.headers
 
     async def test_get_request_not_guarded(self, client):
-        resp = await client.get(
-            "/health/live", headers={"Idempotency-Key": "test-key-get"}
-        )
+        resp = await client.get("/health/live", headers={"Idempotency-Key": "test-key-get"})
         assert "X-Idempotent-Replayed" not in resp.headers
 
     async def test_duplicate_post_returns_cached_response(self, client):

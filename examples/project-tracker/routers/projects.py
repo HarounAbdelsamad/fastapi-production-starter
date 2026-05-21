@@ -3,26 +3,23 @@ Projects router — shows RBAC guards, feature flag gates, and pagination
 using fastapi-production-starter patterns.
 """
 
-from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy.ext.asyncio import AsyncSession
-
-from app.core.auth import get_current_user
 from app.core.rbac import require_role
-from app.db.database import get_session
-from app.models.user import User
-from app.services.feature_service import is_enabled
 from examples.project_tracker.schemas.project import (
     ProjectCreate,
     ProjectRead,
     ProjectUpdate,
-    TaskCreate,
-    TaskRead,
 )
 from examples.project_tracker.services.project_service import (
     create_project,
     get_projects,
     update_project_status,
 )
+from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from app.db.database import get_session
+from app.models.user import User
+from app.services.feature_service import is_enabled
 
 router = APIRouter(prefix="/api/v1/projects", tags=["projects"])
 

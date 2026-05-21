@@ -290,6 +290,4 @@ def get_secrets_provider(backend: str = "env") -> SecretsProvider:
                 "AWS_SECRET_ID environment variable must be set when SECRETS_BACKEND=aws"
             )
         return AWSSecretsManagerProvider(secret_id=secret_id)
-    raise ValueError(
-        f"Unknown SECRETS_BACKEND '{backend}'. Valid values: env, vault, aws"
-    )
+    raise ValueError(f"Unknown SECRETS_BACKEND '{backend}'. Valid values: env, vault, aws")

@@ -1,0 +1,261 @@
+MANUAL STEPS TO COMPLETE — fastapi-production-starter
+======================================================
+Covers every remaining human action from the plan's shippability checklist
+(§9.1–§9.6) through launch and first 90 days.
+Delete this file when all boxes are checked.
+
+Legend:
+  [ ] = not started
+  [~] = in progress
+  [x] = done
+
+======================================================================
+SECTION A — PRE-PUBLISH VERIFICATION  (do locally before any push)
+======================================================================
+
+[ ] A1. Run the full test suite and confirm it passes the 65% threshold
+        make test
+        (Previous run: 65.21% — adding new code may have shifted this.
+         If it dips below 65%, add tests for the new modules before pushing.)
+
+[ ] A2. Run lint — must be clean before push
+        make lint
+        make format-check
+
+[ ] A3. Run mypy baseline — review errors, fix any in app/core/ and app/services/
+        uv run mypy app/ --ignore-missing-imports
+        (First run will show the baseline. Fix "missing return type" and
+         "untyped def" errors in core/ and services/ — those modules have
+         strict checking enabled in pyproject.toml.)
+
+[ ] A4. Skim the OpenAPI docs at http://localhost:8000/docs after `make run`
+        Check: every endpoint has a summary, key endpoints have response examples.
+        At minimum: /auth/login, /health/ready, /api/v1/users/me, /api/v1/webhooks/
+
+======================================================================
+SECTION B — GIT & GITHUB SETUP
+======================================================================
+
+[X] B1. Commit all local changes
+        git add .
+        git commit -m "Phase 7-9 + gap fixes: docs site, type checking, CI fix, sequence diagrams"
+        git push origin master
+
+[ ] B2. Set GitHub repo metadata (browser)
+        URL: https://github.com/HarounAbdelsamad/fastapi-production-starter
+
+        Description (copy-paste exactly):
+          Enterprise FastAPI foundation. SAML. Multi-DB. OpenTelemetry.
+          Audit logs. Zero-downtime migrations. All wired. All toggleable. Off by default.
+
+        Topics (add all):
+          fastapi, python, enterprise, saml, opentelemetry, sqlalchemy,
+          postgresql, rbac, audit-log, zero-downtime, template, boilerplate,
+          multi-database, circuit-breaker, webhook
+
+        Website:
+          https://harounabdelsamad.github.io/fastapi-production-starter/
+
+[ ] B3. Enable GitHub Pages
+        Settings → Pages → Source: GitHub Actions
+        Then trigger first deploy:
+          Actions → "Deploy Docs" → Run workflow → Branch: master
+
+[ ] B4. Verify docs site is live
+        Open: https://harounabdelsamad.github.io/fastapi-production-starter/
+        Check: search works, Mermaid diagrams render, light/dark toggle works.
+
+[ ] B5. Verify CI matrix is green after push
+        Actions → CI → confirm all 4 jobs pass:
+          Lint, Test (SQLite), Test (PostgreSQL), Test (MySQL), Type Check
+
+[ ] B6. Tag v0.1.0 — this also triggers the multi-arch Docker build to GHCR
+        git tag v0.1.0
+        git push origin v0.1.0
+
+[ ] B7. Write the v0.1.0 GitHub release notes
+        GitHub → Releases → Draft a new release → tag: v0.1.0
+        Title: "v0.1.0 — Enterprise FastAPI Foundation"
+        Body (use CHANGELOG.md Phase sections as source):
+          Key sections to include:
+            - What this is (one paragraph, the working pitch)
+            - What's in v0.1.0 (bullet list from CHANGELOG)
+            - Quickstart (3-line install)
+            - Link to docs site
+            - Link to reference implementation
+
+[ ] B8. Verify multi-arch Docker image built and is public on GHCR
+        Actions → "Build and Push Docker Image" → should be green after B6
+        Then: https://github.com/HarounAbdelsamad?tab=packages
+        Confirm image is public (not private) — go to package settings if needed.
+
+[ ] B9. Pin repository on your GitHub profile
+        github.com/HarounAbdelsamad → Edit profile → Customize pins → add this repo
+
+[ ] B10. Enable GitHub Discussions
+         Settings → General → Features → Discussions: ON
+         Create first pinned discussion: "Welcome — share your use case"
+
+======================================================================
+SECTION C — REFERENCE IMPLEMENTATION (public live demo)
+======================================================================
+
+The examples/project-tracker/ folder is the scaffold. To make it a real
+public live demo (required by §9.4):
+
+[ ] C1. Create a separate public GitHub repo
+        Suggested name: fastapi-pt-demo
+        (or deploy directly from the examples/ folder in this repo — simpler)
+
+[ ] C2. Make examples/project-tracker a runnable standalone app
+        It currently has no main.py, Dockerfile, or migrations.
+        Minimum additions needed:
+          - A thin main.py that includes the projects router on top of create_app()
+          - A Dockerfile (can copy from the main repo's Dockerfile)
+          - One Alembic migration for pt_projects and pt_tasks tables
+
+[ ] C3. Deploy it to a free tier host
+        Recommended options (all have free tiers):
+          - Fly.io:   fly launch (auto-detects Dockerfile) → free hobby plan
+          - Railway:  connect GitHub repo → deploy
+          - Render:   new Web Service → link repo → free tier
+        Use SQLite for the demo deployment (no extra DB service needed).
+
+[ ] C4. Update README.md with live demo URL
+        Add a "Reference Implementation" section with:
+          - Link to the demo repo
+          - Live URL
+          - One-paragraph description of what it demonstrates
+
+======================================================================
+SECTION D — EXTERNAL REVIEW (required before public announcement)
+======================================================================
+
+[ ] D1. Identify 2 reviewers
+        Good sources:
+          - Ex-colleagues from Samsung or previous roles
+          - FastAPI GitHub contributors
+            (github.com/fastapi/fastapi/graphs/contributors)
+          - Active members of German Python community
+            (pythonde.slack.com or PyMunich / PyBerlin meetup attendees)
+
+[ ] D2. Send review request (copy-paste message below)
+        -----------------------------------------------------------------
+        Subject: Senior eye on an enterprise FastAPI foundation?
+
+        I've spent the past several months building an enterprise-grade
+        FastAPI foundation — SAML 2.0 SSO, multi-DB CI matrix, pluggable
+        secrets (Vault/AWS), OpenTelemetry wired in, HMAC-signed audit
+        logs, GDPR helpers, circuit breakers, outgoing webhooks — all
+        documented in 12 Architecture Decision Records.
+
+        Would value a senior eye before I announce it publicly. One hour
+        of your time, honest feedback only — no obligation to be positive.
+
+        Repo: https://github.com/HarounAbdelsamad/fastapi-production-starter
+        Docs: https://harounabdelsamad.github.io/fastapi-production-starter/
+        -----------------------------------------------------------------
+
+[ ] D3. Ask reviewers to specifically check:
+          - README: does it pass the "would I show this to a CTO" test?
+          - SECURITY.md: is the OWASP table accurate and honest?
+          - app/core/auth.py, app/core/apikey.py: any obvious auth flaws?
+          - app/core/saml.py: any SAML assertion validation gaps?
+          - docs/identity/ sequence diagrams: are the flows correct?
+
+[ ] D4. Act on feedback — fix everything flagged as an actual issue
+        (not every opinion needs to be addressed, but security/accuracy issues do)
+
+======================================================================
+SECTION E — LAUNCH POSTS (do after D4, in this exact order)
+======================================================================
+
+[ ] E1. LinkedIn post — CV amplification, not a promo post
+        Frame: "I spent 6 months solving the patterns every enterprise team
+        re-implements from scratch. Here's what I built and why."
+        Structure:
+          Para 1: The problem (SAML, Vault, zero-downtime migrations —
+                  patterns re-written at every company)
+          Para 2: What you built (the 12 ADRs, the OWASP table, the CI matrix)
+          Para 3: Link to docs site + call for feedback
+        DO NOT lead with "I built a FastAPI template" — that's generic.
+        Lead with the enterprise problem you're solving.
+
+[ ] E2. Show HN post — post while LinkedIn is getting traction
+        Title: "Show HN: Enterprise FastAPI foundation – SAML, multi-DB,
+                OTel, HMAC audit logs, 12 ADRs"
+        Opening paragraph for the comment thread:
+          "Most FastAPI starters assume you're building a SaaS product.
+           This assumes you're building something that will be scrutinized by
+           an enterprise security team. Every feature is off by default.
+           All 12 design decisions are documented as ADRs."
+        Best time to post: Tuesday–Thursday, 9am–11am US Eastern.
+
+[ ] E3. Blog post — pick ONE of these topics and write 800–1200 words:
+        Option A: "Why we HMAC-sign every audit log row (and why you should too)"
+        Option B: "Testing FastAPI on 3 databases in CI: what breaks and why"
+        Option C: "The async circuit breaker in Python: three states, one asyncio.Lock"
+        Submit to: ITNEXT (Medium) or Better Programming (Medium)
+        Cross-post to: dev.to and your own Hashnode/blog
+        Add link from README docs section once published.
+
+[ ] E4. Reddit posts (after E2 and E3 are up)
+        r/Python: link to Show HN thread (consolidates comments)
+        r/FastAPI: direct post with brief description
+        r/programming: only if the blog post is exceptional
+
+[ ] E5. Targeted outreach — 10-person list (do over 2 weeks, not all at once)
+        Who to reach:
+          - FastAPI maintainers (@tiangolo and core contributors)
+          - Authors of FastAPI books/courses
+          - DevRel engineers at Sentry, Datadog, Honeycomb
+            (they link to projects that demonstrate their product well)
+          - Enterprise-focused Python newsletters
+        Message: 3 sentences max. "Built X. Thought it might be relevant
+        to your work on Y. No ask." Link only. No reply needed.
+
+======================================================================
+SECTION F — FIRST 90 DAYS POST-LAUNCH (recurring cadence)
+======================================================================
+
+Weekly:
+  [ ] F1. Review and merge Dependabot PRs
+  [ ] F2. Acknowledge any new issues within 48 hours
+           (even a "looking into this" counts — silence kills trust)
+
+Monthly:
+  [ ] F3. Cut a tagged release (v0.1.1, v0.1.2, etc.)
+           Even if it's only dependency bumps — release cadence signals health.
+  [ ] F4. Publish one blog post on an architectural decision
+
+Quarterly:
+  [ ] F5. Update README.md roadmap section
+  [ ] F6. Pin a "Current focus" issue on the repo
+  [ ] F7. Review and close stale issues
+
+Conference CFPs (submit as soon as they open — track at papercall.io):
+  [ ] F8. PyCon DE       — easiest, you're in Germany; usually opens Oct/Nov
+  [ ] F9. EuroPython     — usually CFP opens Jan/Feb
+  [ ] F10. FastAPI Conf  — directly relevant audience
+  [ ] F11. PyCon US      — long shot but worth a submission
+
+  Talk title options:
+    "Production patterns every team rewrites — and how to stop"
+    "FastAPI at enterprise scale: SAML, multi-tenancy, observability"
+    "12 architectural decisions, packaged: an opinionated FastAPI foundation"
+    "Zero-downtime database migrations in FastAPI: the expand-contract playbook"
+
+======================================================================
+DONE WHEN (hard gates — don't announce until all are checked):
+======================================================================
+
+  [ ] A: Tests pass, lint clean, mypy baseline reviewed
+  [ ] B1-B5: Pushed, CI green, docs site live
+  [ ] B6-B8: v0.1.0 tagged, release notes written, Docker image public
+  [ ] C: Reference implementation live at a public URL
+  [ ] D: 2 external reviewers gave feedback; critical issues fixed
+  [ ] E1-E3: LinkedIn + Show HN + first blog post published
+
+After those 6 lines are checked — the project is done.
+Everything in F is ongoing maintenance, not a launch gate.
+======================================================================

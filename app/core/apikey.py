@@ -23,9 +23,7 @@ async def get_api_key_user(request: Request, db: AsyncSession) -> User | None:
 
         db_key = await authenticate_api_key(db, api_key)
         if db_key:
-            result = await db.execute(
-                select(User).where(User.user_id == db_key.owner_user_id)
-            )
+            result = await db.execute(select(User).where(User.user_id == db_key.owner_user_id))
             owner = result.scalars().first()
             if owner:
                 return owner

@@ -3,14 +3,14 @@ Project service — shows how to integrate audit log, webhooks, and OTel spans
 into a real business service built on top of fastapi-production-starter.
 """
 
+from app.core.audit import log_event
+from examples.project_tracker.models.project import Project
+from examples.project_tracker.schemas.project import ProjectCreate
 from opentelemetry import trace
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.audit import log_event
 from app.services.webhook_service import dispatch_event
-from examples.project_tracker.models.project import Project
-from examples.project_tracker.schemas.project import ProjectCreate, ProjectRead
 
 tracer = trace.get_tracer(__name__)
 

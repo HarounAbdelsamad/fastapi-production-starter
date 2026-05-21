@@ -95,8 +95,17 @@ async def export_audit_logs(
     output = io.StringIO()
     writer = csv.DictWriter(
         output,
-        fieldnames=["id", "user_id", "action", "resource", "detail", "ip_address",
-                    "created_at", "hmac_signature", "signature_valid"],
+        fieldnames=[
+            "id",
+            "user_id",
+            "action",
+            "resource",
+            "detail",
+            "ip_address",
+            "created_at",
+            "hmac_signature",
+            "signature_valid",
+        ],
     )
     writer.writeheader()
     for entry in logs:

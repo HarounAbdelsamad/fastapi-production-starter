@@ -197,8 +197,8 @@ class TestRateLimitKeyFunctions:
     def _make_request(self, *, user=None, forwarded=None, client_host="1.2.3.4"):
         req = MagicMock()
         req.state.user = user
-        req.headers.get = (
-            lambda key, default=None: forwarded if key == "X-Forwarded-For" else default
+        req.headers.get = lambda key, default=None: (
+            forwarded if key == "X-Forwarded-For" else default
         )
         req.client.host = client_host
         return req

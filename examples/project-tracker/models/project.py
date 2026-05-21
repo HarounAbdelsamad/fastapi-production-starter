@@ -9,11 +9,11 @@ Shows:
 
 from datetime import datetime
 
+from app.core.gdpr import mark_pii  # registers field for pseudonymization
 from sqlalchemy import Boolean, DateTime, ForeignKey, Integer, String, Text, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.database import Base
-from app.core.gdpr import mark_pii  # registers field for pseudonymization
 
 
 class Project(Base):
