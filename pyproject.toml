@@ -1,7 +1,7 @@
 [project]
 name = "fastapi-production-starter"
 version = "0.1.0"
-description = "A production-ready FastAPI starter template with async SQLAlchemy, structured logging, and best practices baked in."
+description = "Enterprise FastAPI foundation — SAML, Multi-DB, OpenTelemetry, Audit logs, Zero-downtime migrations. All wired. All toggleable. Off by default."
 readme = "README.md"
 license = { text = "MIT" }
 requires-python = ">=3.13"
@@ -18,7 +18,7 @@ dependencies = [
     "boto3>=1.34.0",
     "fastapi[standard]>=0.136.1",
     "uvicorn[standard]>=0.46.0",
-    "sqlalchemy[asyncio]>=2.0.30",
+    "sqlalchemy[asyncio]>=2.0.49",
     "aiosqlite>=0.20.0",
     "asyncpg>=0.31.0",
     "aiomysql>=0.3.2",
@@ -32,19 +32,19 @@ dependencies = [
     "pyjwt>=2.12.1",
     "prometheus-fastapi-instrumentator>=7.1.0",
     "python-multipart>=0.0.27",
-    "python-dotenv>=1.0.0",
+    "python-dotenv>=1.2.2",
     "redis[hiredis]>=7.4.0",
-    "sentry-sdk[fastapi]>=2.0.0",
+    "sentry-sdk[fastapi]>=2.59.0",
     "slowapi>=0.1.9",
     "typer>=0.25.1",
     # OpenTelemetry — wired in by default with noop exporter; set OTLP_ENDPOINT to export
     "opentelemetry-sdk>=1.25.0",
-    "opentelemetry-exporter-otlp-proto-grpc>=1.25.0",
+    "opentelemetry-exporter-otlp-proto-grpc>=1.41.1",
     "opentelemetry-instrumentation-fastapi>=0.46b0",
-    "opentelemetry-instrumentation-sqlalchemy>=0.46b0",
+    "opentelemetry-instrumentation-sqlalchemy>=0.62b1",
     "opentelemetry-instrumentation-redis>=0.46b0",
     "opentelemetry-instrumentation-celery>=0.46b0",
-    "opentelemetry-instrumentation-logging>=0.46b0",
+    "opentelemetry-instrumentation-logging>=0.62b1",
 ]
 
 [project.scripts]
@@ -55,7 +55,8 @@ dev = [
     "pytest>=9.0.3",
     "pytest-asyncio>=1.3.0",
     "pytest-cov>=7.1.0",
-    "httpx>=0.27",
+    "httpx>=0.28.1",
+    "mypy>=1.11.0",
     "pre-commit>=4.6.0",
     "ruff>=0.15.12",
 ]
@@ -63,12 +64,24 @@ dev = [
 # On Ubuntu: apt-get install -y xmlsec1 libxmlsec1-dev pkg-config
 # Then: uv sync --extra saml
 saml = ["python3-saml>=1.16.0"]
+# Docs site: uv sync --extra docs && mkdocs serve
+docs = ["mkdocs-material>=9.5.0"]
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
 testpaths = ["tests"]
 filterwarnings = ["ignore::DeprecationWarning"]
-addopts = "--cov=app --cov-report=term-missing --cov-fail-under=50"
+addopts = "--cov=app --cov-report=term-missing --cov-fail-under=65"
+
+[tool.mypy]
+python_version = "3.13"
+strict = false
+ignore_missing_imports = true
+# Core and services have stricter checking — add per-module overrides as coverage grows
+[[tool.mypy.overrides]]
+module = ["app.core.*", "app.services.*"]
+disallow_untyped_defs = true
+warn_return_any = true
 
 [tool.ruff]
 target-version = "py313"

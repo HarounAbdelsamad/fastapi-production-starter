@@ -1,0 +1,133 @@
+site_name: FastAPI Production Starter
+site_description: >-
+  Enterprise FastAPI foundation — SAML, Multi-DB, OpenTelemetry,
+  Audit logs, Zero-downtime migrations. All wired. All toggleable. Off by default.
+site_url: https://harounabdelsamad.github.io/fastapi-production-starter/
+repo_url: https://github.com/HarounAbdelsamad/fastapi-production-starter
+repo_name: HarounAbdelsamad/fastapi-production-starter
+edit_uri: edit/master/docs/
+
+theme:
+  name: material
+  features:
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.sections
+    - navigation.expand
+    - navigation.top
+    - navigation.indexes
+    - search.suggest
+    - search.highlight
+    - search.share
+    - content.code.copy
+    - content.code.annotate
+    - content.tabs.link
+    - toc.follow
+  palette:
+    - scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  icon:
+    repo: fontawesome/brands/github
+
+plugins:
+  - search:
+      separator: '[\s\-,:!=\[\]()"`/]+|\.(?!\d)|&[lg]t;|(?!\b)(?=[A-Z][a-z])'
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - def_list
+  - footnotes
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+      toc_depth: 3
+  - pymdownx.details
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/HarounAbdelsamad/fastapi-production-starter
+
+copyright: Copyright &copy; 2026 Haroun Abdelsamad — MIT License
+
+nav:
+  - Home: index.md
+  - Getting Started: getting-started.md
+  - Architecture:
+    - Overview: architecture/overview.md
+    - ADR Index: architecture/decisions.md
+    - ADRs:
+      - "001 — Why FastAPI": adr/001-why-fastapi.md
+      - "002 — SQLAlchemy 2.0": adr/002-why-sqlalchemy-2.md
+      - "003 — Multi-DB Support": adr/003-multi-db-support.md
+      - "004 — Pluggable Secrets": adr/004-pluggable-secrets.md
+      - "005 — Multi-Tenancy": adr/005-multi-tenancy.md
+      - "006 — SAML Library": adr/006-saml-library.md
+      - "007 — OpenTelemetry": adr/007-opentelemetry-default.md
+      - "008 — Audit Log": adr/008-audit-log.md
+      - "009 — Background Jobs": adr/009-background-jobs-protocol.md
+      - "010 — No Frontend": adr/010-no-frontend.md
+      - "011 — Toggleable Features": adr/011-toggleable-features.md
+      - "012 — Versioning": adr/012-versioning-compatibility.md
+  - Identity:
+    - OAuth 2.0: identity/oauth.md
+    - SAML 2.0: identity/saml-setup.md
+    - API Keys: identity/api-keys.md
+    - RBAC: identity/rbac.md
+    - Service-to-Service: identity/s2s-auth.md
+  - Data:
+    - Multi-DB Support: databases/comparison.md
+    - Connection Pooling: databases/connection-pooling.md
+    - Multi-Tenancy: multi-tenancy.md
+    - Zero-Downtime Migrations: migrations/zero-downtime.md
+  - Observability:
+    - OpenTelemetry: observability/otel.md
+    - Metrics: observability/metrics.md
+    - Logging: observability/logging.md
+    - Stack Setup: observability/stack.md
+  - Compliance:
+    - Audit Log: compliance/audit-log.md
+    - GDPR Helpers: compliance/gdpr.md
+    - Security Headers: compliance/security-headers.md
+    - Rate Limiting: compliance/rate-limiting.md
+  - Operations:
+    - Background Jobs: operations/background-jobs.md
+    - Outgoing Webhooks: operations/webhooks.md
+    - Idempotency Keys: operations/idempotency.md
+    - Circuit Breakers: operations/circuit-breakers.md
+    - Graceful Shutdown: operations/graceful-shutdown.md
+    - Feature Flags: operations/feature-flags.md
+  - Deployment: deployment.md
+  - Recipes: recipes.md
+  - Migration from tiangolo: migration-from-tiangolo.md
+  - FAQ: faq.md

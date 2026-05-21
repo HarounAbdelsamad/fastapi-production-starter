@@ -135,9 +135,7 @@ async def verify_s2s_signature(request: Request) -> str:
 
     secret = services.get(service_id)
     if not secret:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED, detail="Unknown service ID"
-        )
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Unknown service ID")
 
     # Verify signature
     body = await request.body()

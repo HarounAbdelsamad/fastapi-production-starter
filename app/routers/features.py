@@ -3,6 +3,7 @@
 Global flags:   GET/PUT /api/v1/admin/features
 Per-subject:    PUT/DELETE /api/v1/admin/features/{key}/overrides/{type}/{id}
 """
+
 from __future__ import annotations
 
 from fastapi import APIRouter, Depends, HTTPException, status

@@ -100,8 +100,13 @@ class TestPIIRedaction:
 
         f = PIIRedactionFilter()
         record = logging.LogRecord(
-            name="test", level=logging.INFO, pathname="", lineno=0,
-            msg="login from user@example.com", args=(), exc_info=None,
+            name="test",
+            level=logging.INFO,
+            pathname="",
+            lineno=0,
+            msg="login from user@example.com",
+            args=(),
+            exc_info=None,
         )
         f.filter(record)
         assert "user@example.com" not in record.msg
@@ -112,8 +117,13 @@ class TestPIIRedaction:
 
         f = PIIRedactionFilter()
         record = logging.LogRecord(
-            name="test", level=logging.INFO, pathname="", lineno=0,
-            msg="called 555-867-5309", args=(), exc_info=None,
+            name="test",
+            level=logging.INFO,
+            pathname="",
+            lineno=0,
+            msg="called 555-867-5309",
+            args=(),
+            exc_info=None,
         )
         f.filter(record)
         assert "555-867-5309" not in record.msg
@@ -124,8 +134,13 @@ class TestPIIRedaction:
 
         f = PIIRedactionFilter()
         record = logging.LogRecord(
-            name="test", level=logging.INFO, pathname="", lineno=0,
-            msg="ssn is 123-45-6789", args=(), exc_info=None,
+            name="test",
+            level=logging.INFO,
+            pathname="",
+            lineno=0,
+            msg="ssn is 123-45-6789",
+            args=(),
+            exc_info=None,
         )
         f.filter(record)
         assert "123-45-6789" not in record.msg
@@ -136,8 +151,13 @@ class TestPIIRedaction:
 
         f = PIIRedactionFilter()
         record = logging.LogRecord(
-            name="test", level=logging.INFO, pathname="", lineno=0,
-            msg="normal operational log message", args=(), exc_info=None,
+            name="test",
+            level=logging.INFO,
+            pathname="",
+            lineno=0,
+            msg="normal operational log message",
+            args=(),
+            exc_info=None,
         )
         f.filter(record)
         assert record.msg == "normal operational log message"
@@ -147,8 +167,13 @@ class TestPIIRedaction:
 
         f = PIIRedactionFilter()
         record = logging.LogRecord(
-            name="test", level=logging.INFO, pathname="", lineno=0,
-            msg="user: %s", args=("user@corp.com",), exc_info=None,
+            name="test",
+            level=logging.INFO,
+            pathname="",
+            lineno=0,
+            msg="user: %s",
+            args=("user@corp.com",),
+            exc_info=None,
         )
         f.filter(record)
         assert record.args[0] == "[email]"

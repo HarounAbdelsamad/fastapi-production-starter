@@ -16,6 +16,7 @@ Usage::
 
 See ``docs/operations/circuit-breakers.md`` for state-transition details.
 """
+
 from __future__ import annotations
 
 import asyncio

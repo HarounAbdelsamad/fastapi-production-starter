@@ -21,9 +21,7 @@ class TestSignRequest:
         assert "X-Signature" in headers
 
     def test_service_id_matches(self):
-        headers = sign_request(
-            method="GET", path="/", service_id="my-svc", secret="s"
-        )
+        headers = sign_request(method="GET", path="/", service_id="my-svc", secret="s")
         assert headers["X-Service-ID"] == "my-svc"
 
     def test_timestamp_is_recent(self):
@@ -47,6 +45,7 @@ class TestSignRequest:
         assert "abc123" in msg
         # body hash should be present
         import hashlib
+
         assert hashlib.sha256(body).hexdigest() in msg
 
     def test_canonical_message_without_body(self):

@@ -11,15 +11,17 @@ from app.models.audit_log import AuditLog
 
 def _canonical(log: AuditLog) -> str:
     """Deterministic string representation of an audit row used for HMAC signing."""
-    return "|".join([
-        log.id,
-        log.user_id,
-        log.action,
-        log.resource or "",
-        log.detail or "",
-        log.ip_address or "",
-        log.created_at.isoformat(),
-    ])
+    return "|".join(
+        [
+            log.id,
+            log.user_id,
+            log.action,
+            log.resource or "",
+            log.detail or "",
+            log.ip_address or "",
+            log.created_at.isoformat(),
+        ]
+    )
 
 
 def _sign(log: AuditLog, secret: str) -> str:

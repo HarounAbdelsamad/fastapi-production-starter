@@ -2,8 +2,6 @@
 
 from unittest.mock import AsyncMock, MagicMock, patch
 
-import pytest
-
 
 class TestFeatureFlagOverrideModel:
     def test_feature_flag_override_model_exists(self):
@@ -133,9 +131,7 @@ class TestOverrideEndpoints:
         assert resp.status_code in (401, 403)
 
     async def test_delete_override_requires_admin(self, client):
-        resp = await client.delete(
-            "/api/v1/admin/features/my-flag/overrides/user/user-1"
-        )
+        resp = await client.delete("/api/v1/admin/features/my-flag/overrides/user/user-1")
         assert resp.status_code in (401, 403)
 
     async def test_invalid_subject_type_rejected(self, client):

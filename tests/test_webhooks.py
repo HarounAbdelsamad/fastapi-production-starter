@@ -84,9 +84,7 @@ class TestRetrySchedule:
 
         from app.services.webhook_service import _MAX_ATTEMPTS, _schedule_retry
 
-        delivery = SimpleNamespace(
-            attempts=_MAX_ATTEMPTS, status="pending", next_retry_at=None
-        )
+        delivery = SimpleNamespace(attempts=_MAX_ATTEMPTS, status="pending", next_retry_at=None)
         _schedule_retry(delivery)
         assert delivery.status == "failed"
         assert delivery.next_retry_at is None

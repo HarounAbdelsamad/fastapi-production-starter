@@ -156,7 +156,9 @@ async def column_exists(conn: AsyncConnection, table: str, column: str) -> bool:
             await conn.execute(text("ALTER TABLE users ADD COLUMN new_col TEXT"))
     """
     result = await conn.execute(
-        text("SELECT * FROM information_schema.columns WHERE table_name = :table AND column_name = :col"),  # noqa: E501
+        text(
+            "SELECT * FROM information_schema.columns WHERE table_name = :table AND column_name = :col"  # noqa: E501
+        ),
         {"table": table, "col": column},
     )
     return result.fetchone() is not None

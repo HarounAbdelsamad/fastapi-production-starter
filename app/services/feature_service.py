@@ -9,6 +9,7 @@ Results are cached in Redis (when ``CACHE_ENABLED=true``) with a 60-second TTL
 so that repeated calls within a request burst don't hit the database.
 Cache is invalidated on every ``set_flag`` / ``set_override`` write.
 """
+
 from __future__ import annotations
 
 from sqlalchemy import select
