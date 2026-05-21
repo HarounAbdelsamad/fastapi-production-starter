@@ -4,7 +4,7 @@
 > SAML. Multi-DB. OpenTelemetry. Audit logs. Zero-downtime migrations.
 > All wired. All toggleable. Off by default.
 
-[![CI](https://github.com/HarounAbdelsamad/fastapi-production-starter/actions/workflows/ci.yml/badge.svg)](https://github.com/HarounAbdelsamad/fastapi-production-starter/actions)
+[![CI](https://github.com/HarounAbdelsamad/fastapi-production-starter/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/HarounAbdelsamad/fastapi-production-starter/actions/workflows/ci.yml)
 [![Docs](https://img.shields.io/badge/docs-GitHub%20Pages-blue)](https://harounabdelsamad.github.io/fastapi-production-starter/)
 [![Python 3.13+](https://img.shields.io/badge/python-3.13%2B-blue)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
