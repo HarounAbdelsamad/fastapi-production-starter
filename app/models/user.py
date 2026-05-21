@@ -10,9 +10,9 @@ from app.db.mixins import SoftDeleteMixin
 class User(Base, SoftDeleteMixin):
     __tablename__ = "users"
 
-    user_id: Mapped[str] = mapped_column(String, primary_key=True, index=True)
-    username: Mapped[str] = mapped_column(String, unique=True, index=True)
-    password_hash: Mapped[str] = mapped_column(String)
-    email: Mapped[str] = mapped_column(String)
-    phone_number: Mapped[str | None] = mapped_column(String, nullable=True, default="")
-    role: Mapped[str] = mapped_column(String, default="user")
+    user_id: Mapped[str] = mapped_column(String(255), primary_key=True, index=True)
+    username: Mapped[str] = mapped_column(String(255), unique=True, index=True)
+    password_hash: Mapped[str] = mapped_column(String(255))
+    email: Mapped[str] = mapped_column(String(255))
+    phone_number: Mapped[str | None] = mapped_column(String(255), nullable=True, default="")
+    role: Mapped[str] = mapped_column(String(255), default="user")

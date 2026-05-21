@@ -16,10 +16,12 @@ class WebhookEndpoint(Base):
 
     __tablename__ = "webhook_endpoints"
 
-    id: Mapped[str] = mapped_column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
-    url: Mapped[str] = mapped_column(String, nullable=False)
-    secret: Mapped[str] = mapped_column(String, nullable=False)
-    events: Mapped[str] = mapped_column(String, default="*")  # "*" or comma-separated
+    id: Mapped[str] = mapped_column(
+        String(255), primary_key=True, default=lambda: str(uuid.uuid4())
+    )
+    url: Mapped[str] = mapped_column(String(255), nullable=False)
+    secret: Mapped[str] = mapped_column(String(255), nullable=False)
+    events: Mapped[str] = mapped_column(String(255), default="*")  # "*" or comma-separated
     active: Mapped[bool] = mapped_column(default=True)
     created_at: Mapped[datetime] = mapped_column(
         DateTime, default=lambda: datetime.now(UTC).replace(tzinfo=None)
@@ -35,11 +37,13 @@ class WebhookDelivery(Base):
 
     __tablename__ = "webhook_deliveries"
 
-    id: Mapped[str] = mapped_column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
+    id: Mapped[str] = mapped_column(
+        String(255), primary_key=True, default=lambda: str(uuid.uuid4())
+    )
     endpoint_id: Mapped[str] = mapped_column(ForeignKey("webhook_endpoints.id"), nullable=False)
-    event: Mapped[str] = mapped_column(String, nullable=False)
+    event: Mapped[str] = mapped_column(String(255), nullable=False)
     payload: Mapped[str] = mapped_column(Text, nullable=False)  # JSON string
-    status: Mapped[str] = mapped_column(String, default="pending")  # pending/success/failed
+    status: Mapped[str] = mapped_column(String(255), default="pending")  # pending/success/failed
     attempts: Mapped[int] = mapped_column(Integer, default=0)
     response_status: Mapped[int | None] = mapped_column(Integer, nullable=True)
     response_body: Mapped[str | None] = mapped_column(Text, nullable=True)

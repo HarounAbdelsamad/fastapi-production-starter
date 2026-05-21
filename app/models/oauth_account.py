@@ -13,12 +13,14 @@ class OAuthAccount(Base):
         UniqueConstraint("provider", "provider_user_id", name="uq_oauth_provider_uid"),
     )
 
-    account_id: Mapped[str] = mapped_column(String, primary_key=True, default=lambda: str(uuid4()))
-    user_id: Mapped[str] = mapped_column(String, index=True)
-    provider: Mapped[str] = mapped_column(String, index=True)
-    provider_user_id: Mapped[str] = mapped_column(String, index=True)
-    provider_email: Mapped[str | None] = mapped_column(String, nullable=True, default=None)
-    provider_username: Mapped[str | None] = mapped_column(String, nullable=True, default=None)
+    account_id: Mapped[str] = mapped_column(
+        String(255), primary_key=True, default=lambda: str(uuid4())
+    )
+    user_id: Mapped[str] = mapped_column(String(255), index=True)
+    provider: Mapped[str] = mapped_column(String(255), index=True)
+    provider_user_id: Mapped[str] = mapped_column(String(255), index=True)
+    provider_email: Mapped[str | None] = mapped_column(String(255), nullable=True, default=None)
+    provider_username: Mapped[str | None] = mapped_column(String(255), nullable=True, default=None)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
     updated_at: Mapped[datetime] = mapped_column(
         DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
