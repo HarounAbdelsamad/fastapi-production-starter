@@ -1,4 +1,5 @@
 """Outgoing webhook models — endpoint registry and delivery log."""
+
 from __future__ import annotations
 
 import uuid
@@ -35,9 +36,7 @@ class WebhookDelivery(Base):
     __tablename__ = "webhook_deliveries"
 
     id: Mapped[str] = mapped_column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
-    endpoint_id: Mapped[str] = mapped_column(
-        ForeignKey("webhook_endpoints.id"), nullable=False
-    )
+    endpoint_id: Mapped[str] = mapped_column(ForeignKey("webhook_endpoints.id"), nullable=False)
     event: Mapped[str] = mapped_column(String, nullable=False)
     payload: Mapped[str] = mapped_column(Text, nullable=False)  # JSON string
     status: Mapped[str] = mapped_column(String, default="pending")  # pending/success/failed

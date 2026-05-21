@@ -13,6 +13,7 @@ GET / PUT / DELETE are not guarded (GET is safe; PUT / DELETE are idempotent by 
 
 See ``docs/operations/idempotency.md`` for the client contract and edge cases.
 """
+
 from __future__ import annotations
 
 import json

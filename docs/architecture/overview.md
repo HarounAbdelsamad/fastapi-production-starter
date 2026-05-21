@@ -25,8 +25,8 @@ graph TB
     subgraph IAM["Identity & Access"]
         JWT["JWT + Refresh tokens"]
         OAuth["OAuth 2.0 (Google, GitHub)"]
-        SAML["SAML 2.0 (python3-saml, v0.1 roadmap)"]
-        APIKey["API Key auth (v0.1 roadmap)"]
+        SAML["SAML 2.0 (python3-saml)"]
+        APIKey["API Key auth"]
         RBAC["RBAC — roles · permissions · delegation"]
     end
 
@@ -62,6 +62,59 @@ graph TB
     App --> IAM & Data & Obs & BgJobs & Compliance
     Data --> ORM --> Pg & My & Sq
     BgJobs --> Celery --> Redis
+```
+
+## Sequence Diagrams
+
+### JWT Login & Authenticated Request
+
+```mermaid
+sequenceDiagram
+  participant C as Client
+  participant API
+  participant DB
+  participant Redis
+
+  C->>API: POST /api/v1/auth/login {email, password}
+  API->>DB: SELECT User WHERE email=...
+  DB-->>API: User row (hashed password)
+  API->>API: bcrypt.verify(password, hash)
+  alt valid credentials
+    API->>DB: INSERT INTO audit_logs (login.success)
+    API-->>C: {access_token, refresh_token}
+  else invalid
+    API->>DB: increment login_attempts
+    API-->>C: 401 Unauthorized
+  end
+
+  Note over C,Redis: Subsequent authenticated request
+
+  C->>API: GET /api/v1/users/me<br/>Authorization: Bearer <access_token>
+  API->>API: jwt.decode(token) → {sub, tenant_id, roles}
+  opt TOKEN_REVOCATION_ENABLED
+    API->>Redis: GET revoked:<jti>
+    Redis-->>API: nil (not revoked)
+  end
+  API->>DB: SELECT User WHERE id=sub
+  DB-->>API: User row
+  API-->>C: 200 {user}
+```
+
+### Audit Log Write Path
+
+```mermaid
+sequenceDiagram
+  participant Svc as Service
+  participant AuditSvc as audit.log_event()
+  participant DB
+
+  Svc->>Svc: business logic (e.g. update user role)
+  Svc->>AuditSvc: log_event(actor_id, action, resource_type, resource_id, metadata)
+  AuditSvc->>AuditSvc: build canonical row string
+  AuditSvc->>AuditSvc: HMAC-SHA256(canonical, SECRET_KEY) → signature
+  AuditSvc->>DB: INSERT INTO audit_logs (..., hmac_signature)
+  Note over AuditSvc,DB: Same DB transaction as the business operation.<br/>Atomicity: both commit or both roll back.
+  DB-->>Svc: commit OK
 ```
 
 ## Request Lifecycle

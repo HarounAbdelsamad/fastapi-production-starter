@@ -51,16 +51,12 @@ async def _create_user_token(client) -> tuple[str, str]:
 class TestRoleManagement:
     async def test_list_roles_requires_admin(self, client):
         _, user_token = await _create_user_token(client)
-        resp = await client.get(
-            "/api/v1/roles", headers={"Authorization": f"Bearer {user_token}"}
-        )
+        resp = await client.get("/api/v1/roles", headers={"Authorization": f"Bearer {user_token}"})
         assert resp.status_code == 403
 
     async def test_admin_can_list_roles(self, client):
         admin_token = await _create_admin_token(client)
-        resp = await client.get(
-            "/api/v1/roles", headers={"Authorization": f"Bearer {admin_token}"}
-        )
+        resp = await client.get("/api/v1/roles", headers={"Authorization": f"Bearer {admin_token}"})
         assert resp.status_code == 200
         assert isinstance(resp.json(), list)
 

@@ -6,6 +6,7 @@ RQ adapter is a ready-to-fill template for teams that prefer its simplicity.
 
 See ``docs/operations/background-jobs.md`` for choosing between backends.
 """
+
 from __future__ import annotations
 
 from typing import Any, Protocol, runtime_checkable
@@ -36,9 +37,7 @@ class CeleryJobQueue:
     def enqueue_in(self, delay_seconds: int, task_name: str, *args: Any, **kwargs: Any) -> str:
         from app.worker import celery_app
 
-        result = celery_app.send_task(
-            task_name, args=args, kwargs=kwargs, countdown=delay_seconds
-        )
+        result = celery_app.send_task(task_name, args=args, kwargs=kwargs, countdown=delay_seconds)
         return result.id
 
 

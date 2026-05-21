@@ -1,6 +1,5 @@
 """Tests for Settings.validate_config() and migration helper utilities."""
 
-
 from app.core.config import Settings
 from app.db.migration_helpers import BackfillProgress, expand_contract_checklist
 

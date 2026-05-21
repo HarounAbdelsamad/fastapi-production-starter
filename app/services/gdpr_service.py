@@ -50,22 +50,28 @@ async def export_user_data(db: AsyncSession, user_id: str) -> dict:
         return {}
 
     api_keys = (
-        await db.execute(select(ApiKey).where(ApiKey.owner_user_id == user_id))
-    ).scalars().all()
+        (await db.execute(select(ApiKey).where(ApiKey.owner_user_id == user_id))).scalars().all()
+    )
 
     oauth_accounts = (
-        await db.execute(select(OAuthAccount).where(OAuthAccount.user_id == user_id))
-    ).scalars().all()
+        (await db.execute(select(OAuthAccount).where(OAuthAccount.user_id == user_id)))
+        .scalars()
+        .all()
+    )
 
     user_roles = (
-        await db.execute(select(UserRole).where(UserRole.user_id == user_id))
-    ).scalars().all()
+        (await db.execute(select(UserRole).where(UserRole.user_id == user_id))).scalars().all()
+    )
 
     audit_logs = (
-        await db.execute(
-            select(AuditLog).where(AuditLog.user_id == user_id).order_by(AuditLog.created_at)
+        (
+            await db.execute(
+                select(AuditLog).where(AuditLog.user_id == user_id).order_by(AuditLog.created_at)
+            )
         )
-    ).scalars().all()
+        .scalars()
+        .all()
+    )
 
     return {
         "exported_at": datetime.now(UTC).isoformat(),
@@ -128,16 +134,10 @@ async def pseudonymize_user(db: AsyncSession, user_id: str, *, secret: str) -> N
             if not is_user_table:
                 continue
             values = {f: _pseudo(user_id, f, secret) for f in pii_fields}
-            await db.execute(
-                update(model_cls)
-                .where(model_cls.user_id == user_id)
-                .values(**values)
-            )
+            await db.execute(update(model_cls).where(model_cls.user_id == user_id).values(**values))
         else:
             values = {f: _pseudo(user_id, f, secret) for f in pii_fields}
-            await db.execute(
-                update(model_cls).where(user_fk == user_id).values(**values)
-            )
+            await db.execute(update(model_cls).where(user_fk == user_id).values(**values))
 
     # Mark the user record's deleted_at so soft-delete queries exclude it
     await db.execute(

@@ -69,9 +69,7 @@ async def list_api_keys(db: AsyncSession, owner_user_id: str) -> list[ApiKey]:
     return list(result.scalars().all())
 
 
-async def revoke_api_key(
-    db: AsyncSession, *, key_id: str, owner_user_id: str
-) -> ApiKey | None:
+async def revoke_api_key(db: AsyncSession, *, key_id: str, owner_user_id: str) -> ApiKey | None:
     result = await db.execute(
         select(ApiKey).where(ApiKey.key_id == key_id, ApiKey.owner_user_id == owner_user_id)
     )

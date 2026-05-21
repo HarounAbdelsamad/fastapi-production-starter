@@ -1,4 +1,5 @@
 """Outgoing webhook management endpoints (admin only)."""
+
 from __future__ import annotations
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
@@ -108,9 +109,7 @@ async def list_deliveries(
     db: AsyncSession = Depends(get_session),
     _admin: User = Depends(_require_admin),
 ) -> list[DeliveryResponse]:
-    deliveries = await webhook_service.list_deliveries(
-        db, endpoint_id=endpoint_id, limit=limit
-    )
+    deliveries = await webhook_service.list_deliveries(db, endpoint_id=endpoint_id, limit=limit)
     return [
         DeliveryResponse(
             id=d.id,

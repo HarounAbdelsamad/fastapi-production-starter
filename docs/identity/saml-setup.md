@@ -2,6 +2,32 @@
 
 End-to-end guide for SP-initiated SSO using Keycloak as the demo IdP.
 
+## SP-initiated SSO flow
+
+```mermaid
+sequenceDiagram
+  participant U as User (Browser)
+  participant SP as FastAPI (SP)
+  participant IdP as Keycloak (IdP)
+  participant DB
+
+  U->>SP: GET /api/v1/auth/saml/login
+  SP->>SP: build AuthnRequest (signed)
+  SP-->>U: 302 redirect → IdP SSO URL?SAMLRequest=...
+  U->>IdP: GET /sso/redirect?SAMLRequest=...
+  IdP->>U: render login form
+  U->>IdP: POST credentials
+  IdP->>IdP: validate credentials
+  IdP->>IdP: sign SAMLResponse (assertion)
+  IdP-->>U: 302 redirect → SP ACS URL
+  U->>SP: POST /api/v1/auth/saml/acs {SAMLResponse}
+  SP->>SP: verify signature + NotOnOrAfter
+  SP->>SP: extract NameID (email), attributes
+  SP->>DB: find or create User by email
+  SP->>DB: INSERT INTO audit_logs (saml.login.success)
+  SP-->>U: {access_token, refresh_token}
+```
+
 ## Prerequisites
 
 - Docker Compose (for Keycloak)

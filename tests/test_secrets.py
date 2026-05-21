@@ -1,6 +1,5 @@
 """Tests for the SecretsProvider protocol and built-in implementations."""
 
-
 import pytest
 
 from app.core.secrets import (
