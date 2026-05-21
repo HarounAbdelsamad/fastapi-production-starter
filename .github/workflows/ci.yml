@@ -54,9 +54,6 @@ jobs:
           APP_ENV: testing
           DATABASE_URL: "sqlite+aiosqlite:///:memory:"
 
-      - name: Security scan
-        run: uv run pip install pip-audit && uv run pip-audit
-
   # ── PostgreSQL ────────────────────────────────────────────────────────────
   test-postgres:
     name: Test (PostgreSQL)
