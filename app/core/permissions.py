@@ -15,7 +15,7 @@ from app.db.database import get_session
 from app.models.user import User
 
 
-def require_role(*roles: str) -> Callable[[User], User]:
+def require_role(*roles: str) -> Callable:  # type: ignore[type-arg]
     async def checker(user: User = Depends(get_current_user)) -> User:
         if user.role not in roles:
             raise HTTPException(

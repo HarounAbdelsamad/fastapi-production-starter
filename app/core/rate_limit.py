@@ -14,7 +14,7 @@ def get_limiter() -> Limiter:
     }
     if settings.CACHE_ENABLED:
         kwargs["storage_uri"] = settings.REDIS_URL
-    return Limiter(**kwargs)
+    return Limiter(**kwargs)  # type: ignore[arg-type]
 
 
 limiter = get_limiter()

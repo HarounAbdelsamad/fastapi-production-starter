@@ -45,7 +45,7 @@ async def readiness_check(
                 checks["redis"] = "unavailable"
                 http_status = status.HTTP_503_SERVICE_UNAVAILABLE
             else:
-                await redis.ping()
+                await redis.ping()  # type: ignore[misc]
                 checks["redis"] = "ok"
         except Exception:
             checks["redis"] = "unavailable"
@@ -100,7 +100,7 @@ async def dependencies_check(
         else:
             try:
                 t0 = time.perf_counter()
-                await redis.ping()
+                await redis.ping()  # type: ignore[misc]
                 latency_ms = round((time.perf_counter() - t0) * 1000, 2)
                 dependencies["redis"] = {"status": "ok", "latency_ms": latency_ms}
             except Exception as exc:

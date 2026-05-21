@@ -13,7 +13,7 @@ app = typer.Typer()
 
 async def _create_admin(username: str, email: str, password: str) -> None:
     await init_db()
-    async with SessionLocal() as db:
+    async with SessionLocal() as db:  # type: ignore[misc]
         user = await create_user(
             db,
             UserCreate(

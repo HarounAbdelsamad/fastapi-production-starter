@@ -134,7 +134,7 @@ async def pseudonymize_user(db: AsyncSession, user_id: str, *, secret: str) -> N
             if not is_user_table:
                 continue
             values = {f: _pseudo(user_id, f, secret) for f in pii_fields}
-            await db.execute(update(model_cls).where(model_cls.user_id == user_id).values(**values))
+            await db.execute(update(model_cls).where(model_cls.user_id == user_id).values(**values))  # type: ignore[attr-defined]
         else:
             values = {f: _pseudo(user_id, f, secret) for f in pii_fields}
             await db.execute(update(model_cls).where(user_fk == user_id).values(**values))

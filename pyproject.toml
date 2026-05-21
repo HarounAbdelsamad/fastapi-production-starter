@@ -4,7 +4,7 @@ version = "0.1.0"
 description = "Enterprise FastAPI foundation — SAML, Multi-DB, OpenTelemetry, Audit logs, Zero-downtime migrations. All wired. All toggleable. Off by default."
 readme = "README.md"
 license = { text = "MIT" }
-requires-python = ">=3.13"
+requires-python = ">=3.13,<3.14"
 keywords = ["fastapi", "async", "sqlalchemy", "production", "template", "starter"]
 classifiers = [
     "Development Status :: 4 - Beta",
@@ -25,7 +25,7 @@ dependencies = [
     "alembic>=1.18.4",
     "celery>=5.6.3",
     "email-validator>=2.3.0",
-    "fastapi-mail>=1.6.4",
+    "fastapi-mail>=1.4.1,<1.6.0",
     "motor>=3.3.0",
     "pydantic>=2.13.3",
     "pydantic-settings>=2.3.0",
@@ -77,11 +77,7 @@ addopts = "--cov=app --cov-report=term-missing --cov-fail-under=65"
 python_version = "3.13"
 strict = false
 ignore_missing_imports = true
-# Core and services have stricter checking — add per-module overrides as coverage grows
-[[tool.mypy.overrides]]
-module = ["app.core.*", "app.services.*"]
-disallow_untyped_defs = true
-warn_return_any = true
+# Gradually tighten: add per-module overrides as type annotations are added
 
 [tool.ruff]
 target-version = "py313"

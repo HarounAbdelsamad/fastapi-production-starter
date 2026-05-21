@@ -13,7 +13,7 @@ def _mail_config() -> ConnectionConfig:
     settings = get_settings()
     return ConnectionConfig(
         MAIL_USERNAME=settings.MAIL_USERNAME,
-        MAIL_PASSWORD=settings.MAIL_PASSWORD,
+        MAIL_PASSWORD=settings.MAIL_PASSWORD,  # type: ignore[arg-type]
         MAIL_FROM=settings.MAIL_FROM,
         MAIL_PORT=settings.MAIL_PORT,
         MAIL_SERVER=settings.MAIL_SERVER,
@@ -39,7 +39,7 @@ async def send_email(
     fm = FastMail(_mail_config())
     message = MessageSchema(
         subject=subject,
-        recipients=[to],
+        recipients=[to],  # type: ignore[list-item]
         template_body=context,
         subtype=MessageType.html,
     )

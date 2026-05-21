@@ -12,11 +12,12 @@ See docs/observability/otel.md for the full setup guide.
 from __future__ import annotations
 
 import logging
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
 
-def setup_telemetry(app, *, settings) -> None:
+def setup_telemetry(app: Any, *, settings: Any) -> None:
     """Wire OpenTelemetry into the FastAPI application.
 
     Must be called before the first request is handled (i.e., from lifespan
