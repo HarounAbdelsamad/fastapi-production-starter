@@ -26,6 +26,7 @@ Thumbs.db
 # Database (local dev)
 *.db
 *.sqlite3
+tester
 
 # Coverage
 htmlcov/
