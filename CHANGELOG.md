@@ -8,6 +8,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/).
 
 ## [Unreleased]
 
+### Added
+- `GET /api/v1/users/me` returns the authenticated user.
+- OpenAPI response examples for login, readiness, the current user, and webhook list.
+- README section for the project-tracker reference implementation.
+
 ---
 
 ## [0.1.1] - 2026-10-22

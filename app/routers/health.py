@@ -23,7 +23,26 @@ async def liveness_check() -> dict[str, str]:
     return {"status": "alive"}
 
 
-@router.get("/health/ready", summary="Readiness check")
+@router.get(
+    "/health/ready",
+    summary="Readiness check",
+    responses={
+        200: {
+            "content": {
+                "application/json": {
+                    "example": {
+                        "status": "ready",
+                        "checks": {
+                            "database": "ok",
+                            "redis": "disabled",
+                            "celery": "disabled",
+                        },
+                    }
+                }
+            }
+        }
+    },
+)
 async def readiness_check(
     db: AsyncSession = Depends(get_session),
 ) -> JSONResponse:

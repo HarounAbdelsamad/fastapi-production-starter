@@ -48,7 +48,24 @@ async def _revoke_token(
     await db.commit()
 
 
-@router.post("/login", response_model=TokenResponse)
+@router.post(
+    "/login",
+    response_model=TokenResponse,
+    summary="Log in",
+    responses={
+        200: {
+            "content": {
+                "application/json": {
+                    "example": {
+                        "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.access",
+                        "refresh_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.refresh",
+                        "token_type": "bearer",
+                    }
+                }
+            }
+        }
+    },
+)
 @limiter.limit(settings.RATE_LIMIT_AUTH)
 async def login(
     request: Request,

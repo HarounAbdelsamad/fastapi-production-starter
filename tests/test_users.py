@@ -44,6 +44,17 @@ async def test_create_duplicate_user(client):
 
 
 @pytest.mark.asyncio
+async def test_get_current_user(client):
+    payload = make_user_payload()
+    await client.post("/api/v1/users/", json=payload)
+    headers = await auth_headers(client, payload)
+    resp = await client.get("/api/v1/users/me", headers=headers)
+    assert resp.status_code == 200
+    assert resp.json()["user_id"] == payload["user_id"]
+    assert "password" not in resp.json()
+
+
+@pytest.mark.asyncio
 async def test_get_user(client):
     payload = make_user_payload()
     await client.post("/api/v1/users/", json=payload)

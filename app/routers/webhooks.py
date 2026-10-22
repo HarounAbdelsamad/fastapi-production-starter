@@ -73,7 +73,28 @@ async def register_endpoint(
     )
 
 
-@router.get("/", response_model=list[EndpointResponse])
+@router.get(
+    "/",
+    response_model=list[EndpointResponse],
+    summary="List webhook endpoints",
+    responses={
+        200: {
+            "content": {
+                "application/json": {
+                    "example": [
+                        {
+                            "id": "wh-1234abcd",
+                            "url": "https://example.com/hooks",
+                            "events": "user.created",
+                            "active": True,
+                            "created_at": "2026-10-22T12:00:00+00:00",
+                        }
+                    ]
+                }
+            }
+        }
+    },
+)
 async def list_endpoints(
     db: AsyncSession = Depends(get_session),
     _admin: User = Depends(_require_admin),

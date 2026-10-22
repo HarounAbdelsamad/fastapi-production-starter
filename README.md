@@ -26,7 +26,7 @@ Full observability + identity stack (requires Docker):
 make docker-up   # Postgres + Redis + Prometheus + Grafana + Jaeger + Loki
 ```
 
-Published image (multi-arch, built on version tags):
+Published image (multi-arch, built on version tags). The v0.1.1 image is on GHCR; anonymous `docker pull` works after the package is set to public:
 
 ```bash
 docker run --rm -p 8000:8000 \
@@ -83,6 +83,12 @@ These people evaluate templates by cloning and running the test suite, reading t
 - **Not a "low-code" tool.** This is for engineers who want full control.
 
 ---
+
+## Reference Implementation
+
+[examples/project-tracker](examples/project-tracker) is a small multi-tenant project tracker on this foundation. It adds one resource and uses the pieces a real service needs: row-level tenancy, RBAC, an HMAC audit log, outgoing webhooks, a feature-flag gate, a background job, and an OpenTelemetry span. The core package is unchanged.
+
+The same scaffold lives in its own repository: [fastapi-pt-demo](https://github.com/HarounAbdelsamad/fastapi-pt-demo). It is set up to run on SQLite and listen on `0.0.0.0:$PORT`, so a free host can run it without a separate database. There is no public URL yet.
 
 ## Feature Reference
 

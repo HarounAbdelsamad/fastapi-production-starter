@@ -31,6 +31,26 @@ async def list_users(
     return await user_service.get_all_users(db, params)
 
 
+_USER_EXAMPLE = {
+    "user_id": "u-1234abcd",
+    "username": "ada",
+    "email": "ada@example.com",
+    "phone_number": None,
+    "role": "user",
+}
+
+
+@router.get(
+    "/me",
+    response_model=UserResponse,
+    summary="Current user",
+    responses={200: {"content": {"application/json": {"example": _USER_EXAMPLE}}}},
+)
+async def get_me(current_user: User = Depends(get_current_user)) -> User:
+    """Return the authenticated user."""
+    return current_user
+
+
 @router.get("/{user_id}", response_model=UserResponse)
 async def get_user(
     user_id: str,

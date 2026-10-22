@@ -22,9 +22,10 @@ SECTION A — PRE-PUBLISH VERIFICATION
 
 [x] A3. mypy baseline clean — all type errors fixed with targeted # type: ignore.
 
-[ ] A4. Skim the OpenAPI docs at http://localhost:8000/docs after `make run`
-        Check: every endpoint has a summary, key endpoints have response examples.
-        At minimum: /auth/login, /health/ready, /api/v1/users/me, /api/v1/webhooks/
+[x] A4. OpenAPI reviewed from the generated schema.
+        All 45 operations have a summary.
+        Response examples added for /auth/login, /health/ready, /api/v1/users/me,
+        and /api/v1/webhooks/. GET /api/v1/users/me was missing and is now implemented.
 
 ======================================================================
 SECTION B — GIT & GITHUB SETUP
@@ -38,9 +39,10 @@ SECTION B — GIT & GITHUB SETUP
 [x] B3. GitHub Pages enabled — source set to GitHub Actions.
         Docs workflow triggered and deployed.
 
-[ ] B4. Verify docs site is live
-        Open: https://harounabdelsamad.github.io/fastapi-production-starter/
-        Check: search works, Mermaid diagrams render, light/dark toggle works.
+[x] B4. Docs site is live (verified 2026-10-22)
+        https://harounabdelsamad.github.io/fastapi-production-starter/
+        Search and the light/dark toggle are on the home page.
+        Mermaid markup is present on /architecture/overview/.
 
 [x] B5. CI matrix is green — all 5 jobs pass on latest push (run 26255115259):
           Lint ✓  |  Type Check (mypy) ✓  |  SQLite ✓  |  PostgreSQL ✓  |  MySQL ✓
@@ -50,15 +52,15 @@ SECTION B — GIT & GITHUB SETUP
 
 [x] B7. GitHub release v0.1.0 created with release notes.
 
-[ ] B8. Verify Docker image built and is public on GHCR
-        The Docker build for v0.1.0 tag failed (separate workflow issue).
-        Check: https://github.com/HarounAbdelsamad?tab=packages
-        If image is missing or private, re-trigger:
-          git tag -d v0.1.0 && git push origin :v0.1.0
-          git tag v0.1.0 && git push origin v0.1.0
-        Then make image public in package settings if needed.
+[ ] B8. Make the GHCR image public
+        v0.1.1 built and pushed (workflow run 39824825902), including the
+        provenance attestation. Anonymous pull still returns 401, so the
+        package is private. The local gh token does not have packages scope,
+        so this click is still yours:
+          https://github.com/HarounAbdelsamad?tab=packages
+          fastapi-production-starter → Package settings → Change visibility → Public
 
-[ ] B9. Pin repository on your GitHub profile
+[x] B9. Pin repository on your GitHub profile
         github.com/HarounAbdelsamad → Edit profile → Customize pins → add this repo
         (Cannot be done via API — browser only.)
 
@@ -82,11 +84,11 @@ SECTION C — REFERENCE IMPLEMENTATION (public live demo)
           - Render:   new Web Service → link repo → free tier
         Use SQLite for the demo deployment (no extra DB service needed).
 
-[ ] C4. Update README.md with live demo URL
-        Add a "Reference Implementation" section with:
-          - Link to the demo repo (https://github.com/HarounAbdelsamad/fastapi-pt-demo)
-          - Live URL (once deployed)
-          - One-paragraph description of what it demonstrates
+[ ] C4. README has a "Reference Implementation" section
+        It links the in-repo example and
+        https://github.com/HarounAbdelsamad/fastapi-pt-demo
+        and describes what the tracker demonstrates.
+        Still add the live URL here once C3 has a public address.
 
 ======================================================================
 SECTION D — EXTERNAL REVIEW (required before public announcement)
@@ -212,8 +214,8 @@ DONE WHEN (hard gates — don't announce until all are checked):
 
   [x] A: Tests pass, lint clean, mypy baseline reviewed
   [x] B1-B5: Pushed, CI green, docs site live
-  [~] B6-B8: v0.1.0 tagged ✓, release notes ✓, Docker image — needs verify (B8)
-  [ ] C: Reference implementation live at a public URL (C3 + C4 pending)
+  [~] B6-B8: v0.1.1 tagged and the image pushed; still private until B8
+  [ ] C: Reference implementation section is in the README; live URL still needs C3
   [ ] D: 2 external reviewers gave feedback; critical issues fixed
   [ ] E1-E3: LinkedIn + Show HN + first blog post published
 
