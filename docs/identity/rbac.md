@@ -65,11 +65,9 @@ sequenceDiagram
 ```python
 from app.core.permissions import require_permission
 
+
 @router.get("/reports")
-async def get_reports(
-    user: User = Depends(require_permission("reports", "read"))
-):
-    ...
+async def get_reports(user: User = Depends(require_permission("reports", "read"))): ...
 ```
 
 Resolves through the full hierarchy. Falls back to built-in role mapping when no `UserRole` rows exist for the user (backward compat).

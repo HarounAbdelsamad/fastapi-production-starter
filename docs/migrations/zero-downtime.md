@@ -35,6 +35,7 @@ On Postgres, `NOT NULL DEFAULT` with a volatile default locks the table for the 
 ```python
 # alembic/versions/0005_add_user_tier.py
 
+
 def upgrade() -> None:
     op.add_column("users", sa.Column("tier", sa.String(50), nullable=True))
 ```
@@ -53,6 +54,7 @@ import asyncio
 from sqlalchemy.ext.asyncio import create_async_engine
 from app.db.migration_helpers import safe_backfill
 
+
 async def main():
     engine = create_async_engine(DATABASE_URL)
     async with engine.begin() as conn:
@@ -67,6 +69,7 @@ async def main():
     print(f"Backfilled {progress.processed} rows in {progress.elapsed_s}s")
     await engine.dispose()
 
+
 asyncio.run(main())
 ```
 
@@ -76,6 +79,7 @@ Once all rows are populated and the new code is live:
 
 ```python
 # alembic/versions/0006_user_tier_not_null.py
+
 
 def upgrade() -> None:
     # Postgres 11+ can validate the constraint without a full table lock:
@@ -118,9 +122,9 @@ steps = expand_contract_checklist(
 )
 for step in steps:
     print(f"[{step['phase'].upper()} {step['step']}] {step['description']}")
-    if step['sql']:
+    if step["sql"]:
         print(f"  SQL: {step['sql']}")
-    if step['deploy']:
+    if step["deploy"]:
         print("  → Deploy new code version")
 ```
 
@@ -182,9 +186,8 @@ Adding an index locks the table on most databases. On Postgres, use `CONCURRENTL
 
 ```python
 def upgrade() -> None:
-    op.execute(
-        "CREATE INDEX CONCURRENTLY IF NOT EXISTS ix_users_email ON users (email)"
-    )
+    op.execute("CREATE INDEX CONCURRENTLY IF NOT EXISTS ix_users_email ON users (email)")
+
 
 def downgrade() -> None:
     op.execute("DROP INDEX CONCURRENTLY IF EXISTS ix_users_email")
@@ -199,22 +202,23 @@ def downgrade() -> None:
 
 ```python
 # At the top of the migration file:
-def upgrade() -> None:
-    ...
+def upgrade() -> None: ...
+
 
 # Tell Alembic not to wrap this migration in a transaction:
 migration_module = sys.modules[__name__]
 if hasattr(migration_module, "connection"):
     migration_module.connection.execute(text("COMMIT"))  # noqa: S608
 
+
 # Or use op.get_context() to check:
 def upgrade() -> None:
     # op.execute with a raw connection outside the transaction
     with op.get_bind().connect() as conn:
         conn.execute(text("COMMIT"))
-        conn.execute(text(
-            "CREATE INDEX CONCURRENTLY IF NOT EXISTS ix_users_email ON users (email)"
-        ))
+        conn.execute(
+            text("CREATE INDEX CONCURRENTLY IF NOT EXISTS ix_users_email ON users (email)")
+        )
 ```
 
 Practical approach: run `CREATE INDEX CONCURRENTLY` directly from psql before or after the Alembic migration, and update the migration to be a no-op (just records the migration in the alembic_version table).

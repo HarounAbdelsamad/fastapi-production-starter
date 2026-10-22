@@ -26,9 +26,10 @@ from app.core.circuit_breaker import CircuitBreaker, CircuitBreakerOpen
 # Create once at module level (or inject via dependency)
 payments_breaker = CircuitBreaker(
     "payments-api",
-    failure_threshold=5,    # 5 consecutive failures → OPEN
+    failure_threshold=5,  # 5 consecutive failures → OPEN
     recovery_timeout=60.0,  # wait 60 s before probing
 )
+
 
 # Context-manager style
 async def call_payments(user_id: str):
@@ -38,10 +39,9 @@ async def call_payments(user_id: str):
     except CircuitBreakerOpen:
         raise HTTPException(503, "Payment service temporarily unavailable")
 
+
 # Explicit call style
-result = await payments_breaker.call(
-    httpx_client.get("https://payments.example.com/status")
-)
+result = await payments_breaker.call(httpx_client.get("https://payments.example.com/status"))
 ```
 
 ## Wiring into FastAPI
@@ -88,10 +88,9 @@ try:
     result = await breaker.call(client.get(url))
 except httpx.HTTPStatusError as exc:
     if exc.response.status_code == 404:
-        await breaker.record_success()   # 404 is not a health failure
+        await breaker.record_success()  # 404 is not a health failure
         raise
     raise
-
 ```
 
 ## Observability

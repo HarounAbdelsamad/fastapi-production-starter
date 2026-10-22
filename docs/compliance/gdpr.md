@@ -61,8 +61,7 @@ The pseudonym is deterministic (same input → same output) but non-reversible w
 ```python
 # app/models/user.py
 @mark_pii("email", "phone_number")
-class User(Base, SoftDeleteMixin):
-    ...
+class User(Base, SoftDeleteMixin): ...
 ```
 
 After pseudonymization the user row's `deleted_at` is set so soft-delete queries exclude it automatically.
@@ -86,9 +85,9 @@ Mark PII fields on SQLAlchemy models using the `@mark_pii` decorator:
 ```python
 from app.core.pii import mark_pii
 
+
 @mark_pii("email", "phone_number", "full_name")
-class Employee(Base):
-    ...
+class Employee(Base): ...
 ```
 
 The `gdpr_service.pseudonymize_user()` reads this registry at runtime and pseudonymizes all registered fields across all registered models. You do not need to modify the GDPR service when adding new models — just add the decorator.

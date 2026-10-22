@@ -23,6 +23,7 @@ The template must work out of the box (no Vault required), but must also provide
 ```python
 from typing import Protocol
 
+
 class SecretsProvider(Protocol):
     def get(self, key: str) -> str:
         """

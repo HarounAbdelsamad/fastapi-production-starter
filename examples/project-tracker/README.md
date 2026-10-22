@@ -45,6 +45,7 @@ This example is not a standalone app — it shows how you would add the
 ```python
 # In app/main.py, inside create_app():
 from examples.project_tracker.routers.projects import router as projects_router
+
 app.include_router(projects_router)
 ```
 

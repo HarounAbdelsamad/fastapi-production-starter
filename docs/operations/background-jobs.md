@@ -43,9 +43,9 @@ Existing tasks:
 # app/tasks/my_tasks.py
 from app.worker import celery_app
 
+
 @celery_app.task(name="tasks.my_new_task")
-def my_new_task(user_id: str) -> None:
-    ...
+def my_new_task(user_id: str) -> None: ...
 ```
 
 Enqueue from a service:

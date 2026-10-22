@@ -13,6 +13,7 @@ from sqlalchemy import String
 from sqlalchemy.orm import Mapped, mapped_column
 from app.db.database import Base
 
+
 class MyEntity(Base):
     __tablename__ = "my_entities"
 
@@ -55,9 +56,9 @@ Protect an endpoint with the role:
 ```python
 from app.core.permissions import require_role
 
+
 @router.get("/billing/invoices")
-async def list_invoices(_: User = Depends(require_role("billing-manager"))):
-    ...
+async def list_invoices(_: User = Depends(require_role("billing-manager"))): ...
 ```
 
 ---
@@ -131,9 +132,9 @@ Guard an endpoint:
 ```python
 from app.core.feature_flags import require_feature
 
+
 @router.get("/checkout/v2")
-async def new_checkout(_: bool = Depends(require_feature("my-new-feature"))):
-    ...
+async def new_checkout(_: bool = Depends(require_feature("my-new-feature"))): ...
 ```
 
 Enable for a specific user without touching the global flag:
@@ -150,6 +151,7 @@ curl -X PUT http://localhost:8000/api/v1/admin/features/my-new-feature/overrides
 
 ```python
 from app.core.pii import mark_pii
+
 
 @mark_pii("ssn", "date_of_birth")
 class EmployeeProfile(Base):
@@ -170,11 +172,15 @@ After any service action, fire an event to all registered webhook endpoints:
 from app.services import webhook_service
 
 # Inside a route or service, after committing:
-await webhook_service.dispatch_event(db, "order.placed", {
-    "order_id": order.id,
-    "user_id": user.user_id,
-    "total": order.total,
-})
+await webhook_service.dispatch_event(
+    db,
+    "order.placed",
+    {
+        "order_id": order.id,
+        "user_id": user.user_id,
+        "total": order.total,
+    },
+)
 ```
 
 Subscribers receive a signed POST with `X-Webhook-Signature: sha256=<hex>`.
@@ -189,9 +195,9 @@ Define the task in `app/tasks/`:
 # app/tasks/report_tasks.py
 from app.worker import celery_app
 
+
 @celery_app.task(name="tasks.generate_report")
-def generate_report(report_id: str) -> None:
-    ...  # fetch data, write file, send notification
+def generate_report(report_id: str) -> None: ...  # fetch data, write file, send notification
 ```
 
 Enqueue it from a service:

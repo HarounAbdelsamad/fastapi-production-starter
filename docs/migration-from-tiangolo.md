@@ -73,6 +73,7 @@ class User(Base):
     email: Mapped[str] = mapped_column(String(255), unique=True, index=True)
     hashed_password: Mapped[str] = mapped_column(String(255))
 
+
 # Separate Pydantic schema for API
 class UserResponse(BaseModel):
     id: uuid.UUID

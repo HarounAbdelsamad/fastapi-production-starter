@@ -104,6 +104,7 @@ from opentelemetry import trace
 
 tracer = trace.get_tracer(__name__)
 
+
 async def my_service_call():
     with tracer.start_as_current_span("my_service_call") as span:
         span.set_attribute("service.name", "payments")

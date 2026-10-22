@@ -71,6 +71,7 @@ async def acme_login(request: Request):
     client = configure_oauth().create_client("acme")
     return await client.authorize_redirect(request, request.url_for("acme_callback"))
 
+
 @router.get("/acme/callback", name="acme_callback")
 async def acme_callback(request: Request, db: AsyncSession = Depends(get_session)):
     client = configure_oauth().create_client("acme")
@@ -84,11 +85,13 @@ async def acme_callback(request: Request, db: AsyncSession = Depends(get_session
         email=userinfo["email"],
         username=userinfo.get("name", userinfo["email"].split("@")[0]),
     )
-    return JSONResponse(content={
-        "access_token": create_access_token(user.user_id),
-        "refresh_token": create_refresh_token(user.user_id),
-        "token_type": "bearer",
-    })
+    return JSONResponse(
+        content={
+            "access_token": create_access_token(user.user_id),
+            "refresh_token": create_refresh_token(user.user_id),
+            "token_type": "bearer",
+        }
+    )
 ```
 
 **4. Wire in `app/main.py`** (already handled — the oauth router is always included when any OAuth client ID is set).

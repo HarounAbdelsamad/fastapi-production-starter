@@ -46,6 +46,7 @@ Every request includes:
 ```python
 import hashlib, hmac
 
+
 def verify(body: bytes, secret: str, signature: str) -> bool:
     expected = "sha256=" + hmac.new(secret.encode(), body, hashlib.sha256).hexdigest()
     return hmac.compare_digest(expected, signature)

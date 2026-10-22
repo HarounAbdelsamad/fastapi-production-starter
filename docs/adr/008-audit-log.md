@@ -35,13 +35,10 @@ Each audit log entry includes a field `signature` computed as:
 import hashlib
 import hmac
 
+
 def sign_entry(entry: dict, signing_key: str) -> str:
     payload = canonical_serialize(entry)  # deterministic JSON serialization
-    return hmac.new(
-        signing_key.encode(),
-        payload.encode(),
-        hashlib.sha256
-    ).hexdigest()
+    return hmac.new(signing_key.encode(), payload.encode(), hashlib.sha256).hexdigest()
 ```
 
 A verification function checks every row against the current signing key:

@@ -97,12 +97,12 @@ Use `get_read_session` (instead of `get_session`) in route handlers that only ne
 ```python
 from app.db.database import get_read_session
 
+
 @router.get("/users/{user_id}")
 async def get_user(
     user_id: str,
     db: AsyncSession = Depends(get_read_session),  # reads from replica
-):
-    ...
+): ...
 ```
 
 The read replica pool uses the same `DB_POOL_SIZE` and `DB_MAX_OVERFLOW` settings. If you need different sizing for the replica pool, configure it directly in `app/db/database.py`.

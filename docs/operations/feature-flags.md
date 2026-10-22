@@ -54,9 +54,9 @@ DELETE /api/v1/admin/features/new-checkout-flow/overrides/tenant/tenant-xyz
 ```python
 from app.core.feature_flags import require_feature
 
+
 @router.get("/checkout/new")
-async def new_checkout(_: bool = Depends(require_feature("new-checkout-flow"))):
-    ...
+async def new_checkout(_: bool = Depends(require_feature("new-checkout-flow"))): ...
 ```
 
 Returns 404 when the flag is off (feature appears not to exist to the caller).

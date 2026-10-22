@@ -34,6 +34,7 @@ Enterprise teams have strong opinions about their job queue. A template that for
 ```python
 from typing import Protocol, Any, Callable
 
+
 class JobQueue(Protocol):
     def enqueue(
         self,
@@ -73,7 +74,9 @@ class CeleryJobQueue:
     def __init__(self, app: Celery) -> None:
         self.app = app
 
-    def enqueue(self, func: Callable, *args, queue="default", countdown=0, retry=3, **kwargs) -> str:
+    def enqueue(
+        self, func: Callable, *args, queue="default", countdown=0, retry=3, **kwargs
+    ) -> str:
         result = self.app.send_task(
             func.__name__,
             args=args,
@@ -103,7 +106,9 @@ class RQJobQueue:
         self.queues: dict[str, Queue] = {}
         self.redis = redis_conn
 
-    def enqueue(self, func: Callable, *args, queue="default", countdown=0, retry=3, **kwargs) -> str:
+    def enqueue(
+        self, func: Callable, *args, queue="default", countdown=0, retry=3, **kwargs
+    ) -> str:
         q = self._get_queue(queue)
         job = q.enqueue_in(timedelta(seconds=countdown), func, *args, **kwargs)
         return job.id
@@ -120,6 +125,7 @@ def get_job_queue() -> JobQueue:
     if settings.CELERY_ENABLED:
         return CeleryJobQueue(celery_app)
     return NoOpJobQueue()  # for testing / disabled state
+
 
 @router.post("/users/import")
 async def import_users(

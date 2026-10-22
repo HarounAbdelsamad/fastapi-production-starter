@@ -83,6 +83,7 @@ guaranteed span delivery:
 
 ```python
 from opentelemetry import trace
+
 trace.get_tracer_provider().shutdown()
 ```
 

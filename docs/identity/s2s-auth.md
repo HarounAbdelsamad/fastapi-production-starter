@@ -59,6 +59,7 @@ httpx.post("http://api:8000/api/v1/tasks/complete", content=body, headers=header
 ```python
 from app.core.s2s import verify_s2s_signature
 
+
 @router.post("/internal/trigger")
 async def trigger(service_id: str = Depends(verify_s2s_signature)):
     # service_id is the verified caller name
