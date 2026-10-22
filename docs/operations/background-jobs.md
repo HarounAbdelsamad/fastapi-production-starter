@@ -66,7 +66,7 @@ RQ is simpler than Celery but requires Redis and Python callables (not name stri
 2. Implement `enqueue` / `enqueue_in` in `RQJobQueue`
 3. Set `JOB_QUEUE_BACKEND=rq`
 
-See the inline comments in [app/core/jobs.py](../../app/core/jobs.py) for the exact
+See the inline comments in [app/core/jobs.py](https://github.com/HarounAbdelsamad/fastapi-production-starter/blob/master/app/core/jobs.py) for the exact
 calls to make.
 
 ## Choosing between Celery and RQ

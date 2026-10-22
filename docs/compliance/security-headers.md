@@ -23,7 +23,7 @@
 
 ## Customising
 
-The middleware lives in [app/core/middleware.py](../../app/core/middleware.py). Add or modify headers in `SecurityHeadersMiddleware.dispatch`:
+The middleware lives in [app/core/middleware.py](https://github.com/HarounAbdelsamad/fastapi-production-starter/blob/master/app/core/middleware.py). Add or modify headers in `SecurityHeadersMiddleware.dispatch`:
 
 ```python
 response.headers["Cache-Control"] = "no-store"  # prevent caching of API responses

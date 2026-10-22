@@ -110,7 +110,7 @@ groups:
 
 ## Grafana dashboard
 
-The reference dashboard at [monitoring/grafana/dashboards/api.json](../../monitoring/grafana/dashboards/api.json) is provisioned automatically when you start the observability stack.
+The reference dashboard at [monitoring/grafana/dashboards/api.json](https://github.com/HarounAbdelsamad/fastapi-production-starter/blob/master/monitoring/grafana/dashboards/api.json) is provisioned automatically when you start the observability stack.
 
 It includes:
 - Four stat panels (req/s, error rate, P95, P99)

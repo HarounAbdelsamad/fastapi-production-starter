@@ -40,6 +40,9 @@ coverage.xml
 
 # pytest
 .pytest_cache/
+
+# MkDocs build output
+site/
 uploads/
 /fastapi-production-starter-plan.md
 /planned.md

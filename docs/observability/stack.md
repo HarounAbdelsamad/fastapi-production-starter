@@ -57,7 +57,7 @@ The `FastAPI — RED Dashboard` is provisioned automatically. It shows:
 - Per-handler request rate and error rate
 - Request/response size percentiles
 
-Dashboard JSON lives at [monitoring/grafana/dashboards/api.json](../../monitoring/grafana/dashboards/api.json).
+Dashboard JSON lives at [monitoring/grafana/dashboards/api.json](https://github.com/HarounAbdelsamad/fastapi-production-starter/blob/master/monitoring/grafana/dashboards/api.json).
 
 To add your own dashboards, drop JSON files into `monitoring/grafana/dashboards/`. They are provisioned on Grafana startup.
 

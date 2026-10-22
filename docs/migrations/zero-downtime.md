@@ -2,7 +2,7 @@
 
 Enterprise services cannot take downtime for database schema changes. This playbook documents the patterns for making schema changes without dropping availability.
 
-The helper utilities referenced here are in [`app/db/migration_helpers.py`](../../app/db/migration_helpers.py).
+The helper utilities referenced here are in [`app/db/migration_helpers.py`](https://github.com/HarounAbdelsamad/fastapi-production-starter/blob/master/app/db/migration_helpers.py).
 
 ---
 
