@@ -28,7 +28,7 @@ class Settings(BaseSettings):
 
     APP_TITLE: str = "FastAPI Production Starter"
     APP_DESCRIPTION: str = "A production-ready FastAPI starter template."
-    APP_VERSION: str = "0.1.0"
+    APP_VERSION: str = "0.1.1"
 
     CORS_ORIGINS: list[str] = ["http://localhost:3000"]
     CORS_ALLOW_METHODS: list[str] = ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"]

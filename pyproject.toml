@@ -1,6 +1,6 @@
 [project]
 name = "fastapi-production-starter"
-version = "0.1.0"
+version = "0.1.1"
 description = "Enterprise FastAPI foundation — SAML, Multi-DB, OpenTelemetry, Audit logs, Zero-downtime migrations. All wired. All toggleable. Off by default."
 readme = "README.md"
 license = { text = "MIT" }

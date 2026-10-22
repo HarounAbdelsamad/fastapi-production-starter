@@ -10,6 +10,19 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/).
 
 ---
 
+## [0.1.1] - 2026-10-22
+
+### Fixed
+- Production image now builds. Dependencies install before the project, the process runs as a non-root user, listens on `$PORT` (default 8000), and healthchecks `/health/live`.
+- CI builds the image on every push and pull request, without pushing it.
+- Removed a local SQLite database that had been committed, and folded the placeholder folder notes into `CONTRIBUTING.md`.
+
+### Changed
+- Dependency floors brought in from the open Dependabot pull requests, including Ruff 0.17 formatting.
+- GitHub Actions used by the Docker and docs workflows bumped to their current major versions.
+
+---
+
 ## [0.1.0] - 2026-05-20
 
 ### Phase 9 — Launch preparation

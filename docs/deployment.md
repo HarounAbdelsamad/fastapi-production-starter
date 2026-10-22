@@ -8,7 +8,19 @@ copy .env.example .env
 uv run uvicorn app.main:app --reload
 ```
 
-## 2) Docker Compose
+## 2) Docker
+
+Published multi-arch image (linux/amd64 and linux/arm64), built when a version tag is pushed:
+
+```bash
+docker run --rm -p 8000:8000 \
+  -e PORT=8000 \
+  ghcr.io/harounabdelsamad/fastapi-production-starter:0.1.1
+```
+
+The process listens on `0.0.0.0:$PORT` and serves `/health/live`. Set `SECRET_KEY` (64+ characters) before `APP_ENV=production`.
+
+Compose, for local Postgres, Redis, and the worker:
 
 ```bash
 docker compose up -d --build

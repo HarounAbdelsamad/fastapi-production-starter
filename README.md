@@ -26,6 +26,14 @@ Full observability + identity stack (requires Docker):
 make docker-up   # Postgres + Redis + Prometheus + Grafana + Jaeger + Loki
 ```
 
+Published image (multi-arch, built on version tags):
+
+```bash
+docker run --rm -p 8000:8000 \
+  ghcr.io/harounabdelsamad/fastapi-production-starter:0.1.1
+# API at http://127.0.0.1:8000  •  set SECRET_KEY before APP_ENV=production
+```
+
 ---
 
 ## How This Compares
@@ -241,7 +249,7 @@ Major design choices are documented as ADRs in [`docs/adr/`](docs/adr/):
 - [x] Circuit breaker reference implementation
 - [x] Feature flag per-user/tenant overrides (Redis-cached)
 - [x] MkDocs documentation site (GitHub Pages)
-- [x] Multi-arch Docker image (GHCR, linux/amd64 + linux/arm64)
+- [x] Multi-arch Docker image on GHCR (`ghcr.io/harounabdelsamad/fastapi-production-starter`, linux/amd64 + linux/arm64)
 - [x] SECURITY.md + OWASP Top-10 coverage table
 - [x] Cookiecutter template
 
