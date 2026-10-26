@@ -35,7 +35,7 @@ dependencies = [
     "python-dotenv>=1.2.2",
     "redis[hiredis]>=7.4.0",
     "sentry-sdk[fastapi]>=2.59.0",
-    "slowapi>=0.1.9",
+    "slowapi>=0.1.10",
     "typer>=0.25.1",
     # OpenTelemetry — wired in by default with noop exporter; set OTLP_ENDPOINT to export
     "opentelemetry-sdk>=1.25.0",
